@@ -1,0 +1,19 @@
+---
+layout:     post
+title:      "CSDN博客搬家到这儿啦"
+date:       2017-05-13 11:30:00
+author:     "Daniel"
+header-img: "img/post-bg-2015.jpg"
+tags:
+    - Reflection
+
+---
+
+##	CSDN 博客
+
+考虑到CSDN博客广告较多，而且页面的个性化单一，故在此搭建自己的专属博客。之前的博客[**I am not a quitter**](http://blog.csdn.net/aspirinvagrant)不再更新。
+
+搭建Jekyll主题的博客速度很流畅，再次感谢[**Xuan Huang**](https://github.com/Huxpro/huxpro.github.io)提供的模板，让我在很短时间内搭建属于自己的博客。
+
+
+> Please update self every day.

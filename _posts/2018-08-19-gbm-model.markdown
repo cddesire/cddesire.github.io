@@ -1,0 +1,133 @@
+---
+layout:     post
+title:      "GBM 模型总结"
+date:       2018-08-19 10:00:00
+author:     "Daniel"
+header-img: "img/post-bg-model.jpg"
+tags:
+    - Adaboost
+    - GBDT
+    - Xgboost
+
+---
+
+
+## Gradient Boosting Machines (GBM)
+
+Boosting Machines：弱学习器组合成强学习器/模型。
+Gradient Boosting Machines：根据梯度下降方式组合弱学习器。
+
+#### Adaptive Boosting (AdaBoost)
+* 弱分类器：只有一层分裂的决策树
+* 没有先验知识的情况下，初始样本的权重为$$1/N$$，每次迭代后提高误分样本的分布概率
+* 不断的加入新的弱学习器，直到达到终止条件
+* 弱学习器的加权线性组合成强学习器，准确率越高的弱学习机权重越高：$$f(x) = sng(\sum_{m=1} ^{M} \alpha_m \phi_m(x))$$
+
+##### AdaBoost 算法
+1. 对于训练集 $${(x_1, y_1),....(x_N, y_N)}$$ 中的 $$N$$ 个样本，训练集上样本的初始权重分布为 $$w_{1,i}=1/N$$
+
+2. 迭代 $$m=1..M$$
+
+    2.1 对训练样本采用权重 $$w_{m,i}$$ 计算**弱分类器** $$\phi_m(x)$$
+
+    2.2 计算该弱分类器在权重分布 $$w_m$$ 上的**误差** $$ \epsilon_m = \frac {\sum_{n=1}^{N} w_{m,i} \; I(\phi_m(x) \neq y_i)} {\sum_{n=1}^{N} w_{m,i}} $$
+
+    2.3 计算该**弱分类器的权重** $$\alpha_m = \frac {1} {2} log^{\frac {1-\epsilon_m } {\epsilon_m}}$$
+
+    2.4 更新**样本权重分布** $$w_{m+1,i}=\frac{w_{m,i} \; exp(-\alpha_m y_i \phi_m(x_i))} {z_m}$$
+
+3.  最后的到**强分类器** $$f(x) = sgn(\sum_{m=1} ^{M} \alpha_m \phi_m(x))$$
+
+AdaBoost每次迭代更新样本的分布，然后对新分布下的样本学习一个弱分类器及其对应的权重。
+
+
+#### Gradient Boosting
+##### 前向逐步递增（Forward stagewise additive modeling）
+-   初始化：$$f_0(x)=\underset{f}{argmin} \frac{1}{N}\sum_{i=1}^{N} L(f(x_i), y_i)$$
+-   第 $$m$$ 次迭代，$$f_{m}(x_i) = f_{m-1}(x_i) + \beta_m \phi_m(x_i)$$，在第 $$m$$ 步中最小化损失函数 $$L(f)=\sum_{i-1}^{N}(f(x_i), y_i)$$，进而得到相应的弱学习器。
+-   前向逐步递增：$$(\beta_m, \phi_m) = \underset{\beta, \phi}{argmin} \frac{1}{N}\sum_{i=1}^{N} L(f_{m-1}(x_i) + \beta_m \phi_m(x_i), y_i)$$
+
+将 $$f(x)$$ 看成参数，使用梯度下降法得到 $$f_m(x) = f_{m-1}(x) - \beta_m \frac{\partial} {\partial f_{m-1}(x)} L(f_{m-1}(x), y)$$，进而 $$\phi_m(x) \approx - \frac{\partial L(f_{m-1}(x), y)} {\partial f_{m-1}(x)}$$，即用弱分类器 $$\phi_m(x)$$ 通过梯度下降法最小化 $$L(f)$$ 拟合前一轮模型损失函数的负梯度。由于 $$f(x)$$ 为函数，该方法是函数空降的梯度下降。
+
+##### Shrinkage
+对系数增加一个小的收缩因子（学习率）， 测试性能更好，即：
+\\[ f_{m}(x_i) = f_{m-1}(x_i) + \eta \beta_m \phi_m(x_i) \\]
+其中$$0<\eta<1$$，较小的收缩因子通常意味着更多弱分学习器。
+
+#### Gradient Boosting算法
+输入：对于训练集 $${(x_1, y_1),....(x_N, y_N)}$$ 中的 $$N$$ 个样本，可微损失函数 $$L(f(x), y)$$，$$M$$ 次迭代
+算法：
+1. 初始化模型：$$f_0(x) = \underset{f}{argmin} \frac{1}{N} \sum_{i=1}^{N} L(f(x_i), y_i)$$
+
+2. 迭代 $$m=1..M$$
+
+    2.1 计算**伪残差（梯度残差）** $$r_{m,i} = - \left[\frac{\partial L(f(x_i), y_i)}{\partial f(x_i)}\right]_{f=f_{m-1}}, 对于i=1..N$$
+    
+    2.2 将伪残差值来学习**弱分类器** $$\phi_m(x)$$，即使用这 $$(x_i, r_{m,i}) \;N$$ 个样本训练弱分类器
+    
+    2.3 通过线性搜索的方式计算步长，$$\beta_m = \underset{\beta}{arg min} \sum_{i=1}^{N} L(f_{m-1}(x_i) + \beta \phi_m(x) ,y_i)$$
+    
+    2.4 更新模型 $$f_m(x) = f_{m-1}(x_i) + \beta_m \phi_m(x)$$
+    
+3. 输出模型 $$f_M(x)$$
+
+Gradient Boosting算法中，通过 $$M$$ 迭代得到模型 $$f_M(x)$$，其中在第 $$m$$ 步得到一个较弱的模型 $$f_m$$，在 $$m+1$$ 步学习一个弱分类器 $$\phi_m(x)$$，使其拟合残差项 $$f_m(x) - y$$，这样 $$m+1$$ 步的模型预测值 $$f_{m+1}(x)=f_m(x) + \phi_m(x)$$ 更加趋近于真实值 $$y$$。本质上是每次在之前模型损失函数的梯度下降的方向上建立新的模型。
+
+## XGBoost
+
+给定数据集 $$\mathcal { D } = \left\{ \left( \mathbf { x } _ { i } , y _ { i } \right) \right\} \left( | \mathcal { D } | = n , \mathbf { x } _ { i } \in \mathbb { R } ^ { m } , y _ { i } \in \mathbb { R } \right)$$, XGBoost通过逐步递增的方式学习 $$K$$ 棵树，通过如下方式对样本进行预测：
+\\[ \hat { y } _ { i } = \phi \left( \mathbf { x } _ { i } \right) = \sum _ { k = 1 } ^ { K } f _ { k } \left( \mathbf { x } _ { i } \right) , \quad f _ { k } \in \mathcal { F } \\]
+其中，$$\mathcal { F }$$ 为假设空间，$$f(x)$$ 为回归数CART，$$\mathcal { F } = \left\{ f ( \mathbf { x } ) = w _ { q ( \mathbf { x } ) } \right\} \left( q : \mathbb { R } ^ { m } \rightarrow T , w \in \mathbb { R } ^ { T } \right)$$。
+$$q(x)$$ 表示将样本 $$x$$ 分到了某个叶子节点上，$$w$$ 是叶子节点的分数(leaf score)，$$wq(x)$$ 表示回归树对样本的预测值。回归树的预测输出是实数分数，用于回归、分类、排序任务中，对于回归问题直接作为目标值，对于分类问题，需要映射成概率。
+
+XGBoost目标函数：
+\\[  \begin{aligned} \widetilde { L } ^ { ( t ) } & = \sum _ { i = 1 } ^ { n } \left[ g _ { i } f _ { t } \left( x _ { i } \right) + \frac { 1 } { 2 } h _ { i } f _ { t } ^ { 2 } \left( x _ { i } \right) \right] + \Omega \left( f _ { t } \right) \\ & = \sum _ { i = 1 } ^ { n } \left[ g _ { i } w _ { q \left( x _ { i } \right) } + \frac { 1 } { 2 } h _ { i } w _ { q \left( x _ { i } \right) } ^ { 2 } \right] + \gamma T + \lambda \frac { 1 } { 2 } \sum _ { j = 1 } ^ { T } w _ { j } ^ { 2 } \end{aligned} \\]
+其中，$$g _ { i } = \partial _ { \hat { y } } ( t - 1 ) l \left( y _ { i } , \hat { y } ^ { ( t - 1 ) } \right)$$ 和 $$h _ { i } = \partial _ { \hat { y } ^ { ( t - 1 ) } } ^ { 2 } l \left( y _ { i } , \hat { y } ^ { ( t - 1 ) } \right)$$，目标函数只依赖于每个数据点的在误差函数上的一阶导数和二阶导数。
+
+#### 优势
+1. 正则化提升(regularized boosting)：正则化有助于减少过拟合，标准GBM的实现没有显式的正则化步骤。
+2. 并行处理。支持GPU加速、支持分布式。
+3. 剪枝。当新增分裂带来负增益时，GBM会停止分裂。xgb一直分裂到指定的最大深度(max_depth)，然后回过头来剪枝。
+4. 内置交叉验证。xgb允许在每一轮boosting迭代中使用交叉验证，可以方便地获得最优boosting迭代次数。GBM使用网格搜索。
+5. 多语言接口。
+6. 执行速度。
+
+#### 模型参数
+
+|参数|描述|作用|缺省值|
+|:--:|:--|:--|:--|
+|booster|弱分类器，可以选择gbtree和gblinear|gbtree使用基于树的模型进行提升计算，gblinear使用线性模型进行提升计算。|gbtree|
+|silent|取0表示打印出运行时信息，取1表示不打印运行时信息||0|
+|nthread|xgb运行时的线程数||当前系统可以获得的最大线程数|
+|eta|学习率或收缩因子shrinking|防止过拟合，通过缩减特征的权重使提升计算过程更加保守|0.3|
+|n_estimators|弱分类器数目||100|
+|min_child_weight|叶子节点中最小的样本权重和，如果一个节点中的样本权重和小于min_child_weight则拆分过程结束；在线性回归模型中指建立每个模型所需要的最小样本数|用来控制过拟合，设置过大导致欠拟合|1|
+|max_depth|树的最大深度|防止过拟合|默认6，一般设置为3-10|
+|max_leaf_nodes|一棵树中最多叶子节点个数||根据`max_depth`确定|
+|gamma|节点分裂所需的最小损失函数下降值|使算法更加保守|0|
+|subsample|为每棵树所需训练样本的随机采样比例|设置过小会使算法过于保守避免过拟合，但会出现欠拟合|默认1，一般设置为0.5-1|
+|colsample_bytree|为每棵树所用特征比例||默认1，一般设置为0.5-1|
+|colsample_bylevel|每一层每一次分割所用特征比例||1|
+|lambda|L2正则项(Ridge regression)|控制过拟合|1|
+|alpha|L1正则项(Lasso regression)||0|
+|scale_pos_weight|正负样本的平衡，使算法快速收敛||1|
+|objective|定义最小化的损失函数|binary:logistic、multi:softmax、multi:softprob|reg:linear|
+|eval_metric|评价函数|rmse、mae、logloss、error、merror、mlogloss、auc、ndcg、ndcg@n|分类：error；回归：rmse；|
+|scale_pos_weight|处理类别不平衡，使算法快速收敛|||
+
+
+#### 代码示例
+``` python
+import xgboost as xgb
+
+dtrain = xgb.DMatrix(X_train, label = y)
+dtest = xgb.DMatrix(X_test)
+
+params = {"max_depth":2, "eta":0.1}
+model = xgb.cv(params, dtrain, num_boost_round=500, early_stopping_rounds=100)
+model.loc[30:,["test-rmse-mean", "train-rmse-mean"]].plot()
+
+model_xgb = xgb.XGBRegressor(n_estimators=360, max_depth=2, learning_rate=0.1)
+model_xgb.fit(X_train, y)
+
+```

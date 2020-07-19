@@ -1,0 +1,90 @@
+# Site settings
+title: Geek Stuff Blog
+SEOTitle: 常栋的博客 | Geek Stuff Blog
+header-img: img/home-bg.jpg
+email: cdaspirin@gmail.com
+description: "后山人"
+keyword: "常栋，后山人"
+url: "https://cddesire.github.io"              # your host, for absolute URL
+baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
+
+
+
+# SNS settings
+RSS: false
+zhihu_username:     aspirinvagrant
+csdn_username:     aspirinvagrant
+github_username:    cddesire
+
+
+
+# Build settings
+# from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
+highlighter: rouge
+permalink: pretty
+paginate: 10
+exclude: ["less","node_modules","Gruntfile.js","package.json","README.md","README.zh.md"]
+anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
+future: true
+
+# plugins
+# from PR#40, to support local preview for Jekyll 3.0
+plugins: [jekyll-paginate]
+
+
+# Markdown settings
+# replace redcarpet to kramdown,
+# although redcarpet can auto highlight code, the lack of header-id make the catalog impossible, so I switch to kramdown
+# document: http://jekyllrb.com/docs/configuration/#kramdown
+markdown: kramdown
+kramdown:
+  input: GFM                            # use Github Flavored Markdown !important
+
+
+
+# Disqus settings
+#disqus_username: _your_disqus_short_name_
+
+# Duoshuo settings
+#duoshuo_username: huxblog
+# Share component is depend on Comment so we can NOT use share only.
+duoshuo_share: true                     # set to false if you want to use Comment without Sharing
+
+
+
+
+# Sidebar settings
+sidebar: true                           # whether or not using Sidebar.
+sidebar-about-description: "I am not quitter."
+sidebar-avatar: /img/aspirin-vagrant.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+
+
+
+# Featured Tags
+featured-tags: true                     # whether or not using Feature-Tags
+featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
+
+
+
+# Progressive Web Apps
+chrome-tab-theme-color: "#000000"
+service-worker: true
+
+
+
+# Friends
+friends: [
+    {
+        title: "Java Code Geeks",
+        href: "http://www.javacodegeeks.com/"
+    },{
+        title: "Cross Validated",
+        href: "http://stats.stackexchange.com/"
+    },{
+        title: "ifeve",
+        href: "http://ifeve.com/"
+    },{
+        title: "Free Mind",
+        href: "http://freemind.pluskid.org"
+    }
+]
