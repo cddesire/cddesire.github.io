@@ -3,7 +3,7 @@ layout:     post
 title:      "C++ 必要代码片段"
 date:       2020-07-19 14:10:00
 author:     "Daniel"
-header-img: "img/post-bg-python.jpg"
+header-img: "img/post-bg-cpp.jpg"
 tags:
     - C++
 
@@ -291,7 +291,7 @@ mymap.erase(mymap.find("China"), mymap.end()); // erasing by range
 
 // 查找
 std::unordered_map<std::string, std::string>::const_iterator got = mymap.find("France");
-if ( got == mymap.end() )
+if (got == mymap.end())
   std::cout << "not found";
 else
   std::cout << got->first << " is " << got->second;
