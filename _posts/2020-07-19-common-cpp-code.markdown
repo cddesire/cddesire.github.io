@@ -233,7 +233,6 @@ std::map<char,int>::iterator itLow = mymap.lower_bound ('b'); // 等于或大于
 std::map<char,int>::iterator itUp = mymap.upper_bound ('d');   // 大于'd'
 mymap.erase(itLow, itUp);        // erases [itLow, itUp)
 
-
 ```
 
 #### 6、unordered_map 
@@ -243,11 +242,11 @@ mymap.erase(itLow, itUp);        // erases [itLow, itUp)
 
 // 初始化
 typedef std::unordered_map<std::string, std::string> stringmap;
-stringmap m1; // empty
-stringmap m2({{"apple", "red"}, {"lemon", "yellow"}});      // init list
-stringmap m3({{"orange", "orange"}, {"strawberry", "red"}}); // init list
-stringmap m4(m2);                                       // copy
-stringmap m5(m4.begin(), m4.end());                  // range
+std::unordered_map<std::string, std::string> m1; // empty
+std::unordered_map<std::string, std::string> m2({{"apple", "red"}, {"lemon", "yellow"}});      // init list
+std::unordered_map<std::string, std::string> m3({{"orange", "orange"}, {"strawberry", "red"}}); // init list
+std::unordered_map<std::string, std::string> m4(m2);                                       // copy
+std::unordered_map<std::string, std::string> m5(m4.begin(), m4.end());                  // range
 for (auto &x : m5)
     std::cout << " " << x.first << ":" << x.second;
 
@@ -353,9 +352,10 @@ v.erase(pos, v.end());
 
 ```
 
-#### 8、字符串数字转换
+#### 8、类型转换
 ``` c++
 #include <string>
+// 字符串转数字
 std::string str_hex = "40c3";
 std::string str_bin = "-10010110001";
 std::string str_auto = "0x7f";
@@ -375,6 +375,16 @@ std::string orbits("686.97 365.24");
 std::string::size_type sz; // alias of size_t
 float mars = std::stof(orbits, &sz);
 float earth = std::stof(orbits.substr(sz));
+
+// 字符串转char*
+std::string str = "hello world";
+const char *p = str.data();
+const char *p = str.c_str();
+const char* p = "Hello world";
+std::string str = p;
+
+const char* pBuf = "hello world";
+const unsigned char * pTmp = (const unsigned char *)pBuf;
 
 ```
 
@@ -439,8 +449,18 @@ if (!p1)
 
 ```
 
-#### 9、字典排序
+#### 9、匿名函数
 ``` c++
+// [捕获列表](参数列表) -> 返回类型 {函数体}
+int c = 12;
+auto add = [c](int a, int b) -> int {
+    return c;
+};
+auto add = [&c](int a, int b) -> int {
+    c = a;
+    return c;
+};
+
 
 ```
 

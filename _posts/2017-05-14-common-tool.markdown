@@ -106,8 +106,12 @@ tags:
 
 
 ### Cmder
--  中文乱码      set LANG=zh_CN.UTF8
+-  中文乱码      set LANG=zh_CN.UTF8 或者命令 chcp 65001
 
+
+### VSCode （windows）
+- 删除整行	ctrl+shift+k
+- 变量重命名	ctrl+F2
 
 
 ### VI
