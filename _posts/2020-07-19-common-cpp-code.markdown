@@ -24,20 +24,14 @@ ARRAY_SIZE(percents)
 ``` c++
 // std::lower_bound 在first和last中的前闭后开区间进行二分查找，返回大于或等于val的第一个元素的iterator位置。如果所有元素都小于val，则返回last的iterator位置。
 #include <algorithm>
-float percentLineNorm(uint32_t *percents, size_t size, uint32_t value)
-{
+float percentLineNorm(uint32_t *percents, size_t size, uint32_t value) {
     auto it = std::lower_bound(percents, percents + size, value);
     auto diff = std::distance(percents, it);
-    if (diff == 0)
-    {
+    if (diff == 0) {
         return 0;
-    }
-    else if ((diff + 1) >= static_cast<long>(size))
-    {
+    } else if ((diff + 1) >= static_cast<long>(size)) {
         return 1;
-    }
-    else
-    {
+    } else {
         auto v = 1.0 * diff / size - (1.0 * percents[diff] - value) / (size * (1.0 * percents[diff] - percents[diff - 1]));
         return v;
     }
@@ -71,12 +65,6 @@ std::cout << chrono::duration_cast<chrono::minutes>(t3).count() <<” minutes”
 typedef std::chrono::duration<int, std::ratio<60 * 60 * 24>> days_type;
 std::chrono::time_point<std::chrono::system_clock, days_type> today = std::chrono::time_point_cast<days_type>(std::chrono::system_clock::now());
 std::cout << today.time_since_epoch().count() << " days since epoch" << std::endl;
-
-uint32_t timePoint2Seconds(const std::chrono::system_clock::time_point &time)
-{
-    auto microSeconds = std::chrono::duration_cast<std::chrono::microseconds>(time.time_since_epoch()).count();
-    return static_cast<uint32_t>(microSeconds / 1000 / 1000);
-}
 
 // 时钟Clocks
 // 表示当前的系统时钟，内部有time_point, duration, Rep, Period等信息，它主要用来获取当前时间，以及实现time_t和time_point的相互转换。
@@ -503,7 +491,6 @@ auto add = [&c](int a, int b) -> int {
     return c;
 };
 
-
 ```
 
 #### 10、future
@@ -546,7 +533,7 @@ fut.get();
 
 #### 11、结构体对象创建
 ``` c++
-struct Student{ 
+struct Student { 
     std::string name;
     char sex;
     int age;
@@ -590,6 +577,3 @@ std::mt19937 gen(rd());
 // [0-9]之间的随机数
 int rnd = std::uniform_int_distribution<> dis(0, 9)(gen);
 ```
-
-
- 
