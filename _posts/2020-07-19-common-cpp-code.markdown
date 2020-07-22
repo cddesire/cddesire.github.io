@@ -503,7 +503,6 @@ auto add = [&c](int a, int b) -> int {
     return c;
 };
 
-
 ```
 
 #### 10、future
