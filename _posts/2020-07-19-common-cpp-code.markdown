@@ -444,15 +444,13 @@ stuct Node {
 template<typename T>
 class LinkedList {
 public:
-    void front(const T& data) 
-    {
+    void front(const T& data) {
         auto node = std::make_unique<Node<T>>();
         node -> data = data;
         node -> next = std::move(head.next);
         head.next = std::move(node); 
     }
-    void print() 
-    {
+    void print() {
         Node<T>* node = head.next.get();
         while (node) {
             std::cout << node -> data << " ";
@@ -476,7 +474,6 @@ if (!p1)
     std::cout << "p1 is NULL" << std::endl; // 输出
 }
 
-
 ```
 
 #### 9、匿名函数
@@ -490,7 +487,6 @@ auto add = [&c](int a, int b) -> int {
     c = a;
     return c;
 };
-
 ```
 
 #### 10、future
