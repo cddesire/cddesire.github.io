@@ -86,6 +86,16 @@ std::chrono::steady_clock::time_point t2 = std::chrono:: system_clock::now();
 std::cout << (t2-t1).count()<<" tick count " << std::endl;
 cout << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<"microseconds";
 
+// 计算耗时
+using clk = std::chrono::system_clock;
+auto toMs = [](clk::duration duration) -> uint64_t {
+    return std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000;
+};
+auto start = clk::now();
+// run code XXXX
+auto end = clk::now();
+uint64_t elpased = toMs(end - start);
+
 // time_point转换为ctime：
 std::time_t now_c = std::chrono::system_clock::to_time_t(time_point);
 // ctime 转 time_point
@@ -114,8 +124,13 @@ std::set<string, greater<>> s5;  // 默认是从小到大排序，这里变成�
 
 // 遍历
 std::unordered_set<int> us {1, 2, 3, 4};
-for (auto it = us.begin(); it != us.end(); it++) {
-    cout << *it;
+for (auto it = std::begin(us); it != std::end(us); it++) {
+    std::cout << *it << " ";
+}
+auto it = std::begin(us), end = std::end(us);
+while (std::distance(it, end) != 0) {
+    std::cout << *it << " ";
+    it = std::next(it);   
 }
 
 std::unordered_set<int> c;
@@ -152,19 +167,16 @@ c.swap(c2);
 
 // 查找
 std::unordered_set<int>::iterator find_iter = c4.find(2);
-if (find_iter != c4.end())
-{
+if (find_iter != c4.end()){
     std::cout << "找到元素 : " << *find_iter << std::endl;
-}
-else
-{
+} else {
     std::cout << "没找到 !" << std::endl;
 }
 std::cout << "value出现次数 :" << c4.count(2) << std::endl; //set key不可重复
 
 
-std::unordered_set<int>::hasher func = c_.hash_function();
-std::unordered_set<int>::key_equal equal = c_.key_eq();
+std::unordered_set<int>::hasher func = c.hash_function();
+std::unordered_set<int>::key_equal equal = c.key_eq();
 std::cout << "hash_func: " << func(11111) << std::endl;
 std::cout << "key_eq: " << equal(11111, 11111) << std::endl;
 
@@ -196,8 +208,7 @@ mymap.insert(std::pair<char, int>('a', 100));
 mymap.insert(std::pair<char, int>('z', 200));
 std::pair<std::map<char, int>::iterator, bool> ret;
 ret = mymap.insert(std::pair<char, int>('z', 500));
-if (ret.second == false)
-{
+if (ret.second == false) {
     std::cout << "element 'z' already existed";
     std::cout << " with a value of " << ret.first->second << '\n';
 }
@@ -318,7 +329,9 @@ v1.insert(v1.end(), 4);
 v1.erase(v1.begin() + 1);
 v1.erase(v1.begin(), v1.begin() + 2);
 v1.assign(2, 10);
-
+// 第二个位置后边插入5
+v.insert(std::next(std::begin(v), 2), 5);
+v.insert(std::begin(v) + 2, 5);
 
 // 访问      
 v1.at(1)
@@ -342,6 +355,12 @@ bool comp(const int &a, const int &b){
     return a < b;
 }
 sort(v1.begin(), v1.end(), comp);
+// 对象排序
+std::vector<std::pair<size_t, float>> scores;
+std::sort(std::begin(scores), std::end(scores), [](const auto &x, const auto &y) {
+        return x.second > y.second;
+    });
+
 
 // 去重
 std::vector<int> v{3, 4, 5, 1, 2, 5, 3};
@@ -350,6 +369,29 @@ sort(v.begin(), v.end());
 std::vector<int>::iterator pos = unique(v.begin(), v.end());
 v.erase(pos, v.end());
 
+// reserve capacity=10 size=0
+std::vector<int> v1;
+v1.reserve(10);
+// resize capacity=10 size=10 默认用0填充
+std::vector<int> v2;
+v2.resize(10);
+std::mt19937 rand;
+std::shuffle(std::begin(v1), std::end(v1), rand);
+
+// map转pair后排序 
+using PairVector = std::vector<std::pair<uint64_t, uint64_t>>;
+std::unordered_map<uint64_t, uint64_t> tagMap{{11, 22}, {1111, 2222}, {111, 222}};
+PairVector tagsVec(std::make_move_iterator(std::begin(tagMap)), std::make_move_iterator(std::end(tagMap)));
+auto compare = [](const PairVector::value_type &prev, const PairVector::value_type &next) {
+    return prev.second > next.second;
+};
+std::sort(tagsVec.begin(), tagsVec.end(), compare);
+
+// inserter
+std::vector<int> d {100, 200, 300};
+std::vector<int> v {1, 2, 3, 4, 5};
+std::copy(d.begin(), d.end(), std::inserter(v, std::next(v.begin())));
+// v: 1 100 200 300 2 3 4 5
 ```
 
 #### 8、类型转换
@@ -464,8 +506,90 @@ auto add = [&c](int a, int b) -> int {
 
 ```
 
-#### 10、字典取值
+#### 10、future
 ``` c++
-                                      
+#include <iostream>
+#include <future>
+#include <thread>
+
+auto get_value = []() { return 10; };
+std::future<int> foo; // default-constructed
+std::future<int> bar = std::async(get_value); // move-constructed
+int x = bar.get();
+int x2 = bar.get(); // 错误, 对于每个future的共享状态，get函数最多仅被调用一次
+
+// shared_future 可被多次访问
+std::future<int> fut = std::async([]() { return 10; });
+std::shared_future<int> shfut = fut.share();
+std::cout << "fut valid: " << fut.valid() << '\n';// 0
+std::cout << "value: " << shfut.get() << shfut.get() * 2 << '\n'; // 10
+
+// wait
+auto is_prime = [](int x) {
+    for (int i = 2; i < x; ++i) if (x%i == 0) return false;
+    return true;
+};
+std::future<bool> fut = std::async(is_prime, 194232491);
+// wait (1)等待共享状态就绪；(2)如果共享状态尚未就绪，则该函数将阻塞调用的线程直到就绪；(3)当共享状态就绪后，则该函数将取消阻塞并void返回。
+fut.wait();
+if (fut.get()) std::cout << "is prime.\n";
+else std::cout << "is not prime.\n";
+
+std::chrono::milliseconds span(100);
+// 可能多次调用std::future::wait_for函数
+while (fut.wait_for(span) == std::future_status::timeout) 
+    std::cout << '.';
+fut.get();
+
+
 ```
 
+#### 11、结构体对象创建
+``` c++
+struct Student{ 
+    std::string name;
+    char sex;
+    int age;
+};
+Student stu = {"aa" ,'m', 21};
+std::cout << stu.name << " " << stu.sex << " " << stu.age << "\n";
+auto stu2 = Student{.name = "aa", .sex = 'm'};
+std::cout << stu2.name << " " << stu2.sex << " " << stu2.age << "\n";
+```
+
+#### 12、 transform
+``` c++
+std::string s("hello");
+std::transform(s.begin(), s.end(), s.begin(),
+               [](unsigned char c) -> unsigned char { return std::toupper(c); });
+// s -> HELLO
+std::vector<std::size_t> ordinals;
+std::transform(s.begin(), s.end(), std::back_inserter(ordinals),                [](unsigned char c) -> std::size_t { return c; });
+std::transform(s.begin(), s.end(), std::inserter(ordinals, ordinals.begin()),
+               [](unsigned char c) -> std::size_t { return c; });
+// s -> {72 69 76 76 79}
+std::transform(ordinals.cbegin(), ordinals.cend(), ordinals.cbegin(),
+                   ordinals.begin(), std::plus<>{});
+// s -> {144 138 152 152 158}
+```
+
+#### 13、random
+``` c++
+#include <random>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
+std::vector<int> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+std::random_device rd;
+std::mt19937 g(rd());
+std::shuffle(v.begin(), v.end(), g);
+std::copy(v.begin(), v.end(), std::ostream_iterator<int>(std::cout, " "));
+
+std::random_device rd;  
+std::mt19937 gen(rd());
+// [0-9]之间的随机数
+int rnd = std::uniform_int_distribution<> dis(0, 9)(gen);
+```
+
+
+ 
