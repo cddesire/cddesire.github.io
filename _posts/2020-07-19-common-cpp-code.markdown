@@ -545,7 +545,7 @@ fut.get();
 
 #### 11、结构体对象创建
 ``` c++
-struct Student{ 
+struct Student { 
     std::string name;
     char sex;
     int age;
@@ -589,6 +589,3 @@ std::mt19937 gen(rd());
 // [0-9]之间的随机数
 int rnd = std::uniform_int_distribution<> dis(0, 9)(gen);
 ```
-
-
- 
