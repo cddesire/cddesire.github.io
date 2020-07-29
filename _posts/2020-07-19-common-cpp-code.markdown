@@ -58,7 +58,7 @@ std::chrono::minutes t1(10);
 std::chrono::seconds t2(60);
 std::chrono::seconds t3 = t1 - t2;
 std::cout << t3.count() << " second" << std::endl;
-std::cout << chrono::duration_cast<chrono::minutes>(t3).count() <<” minutes”<< endl;
+std::cout << chrono::duration_cast<chrono::minutes>(t3).count() <<"minutes" << endl;
 
 // 时间点Time point
 // time_point表示一个时间点，用来获取1970.1.1以来的秒数和当前的时间
@@ -228,8 +228,8 @@ if (it != mymap.end())
 std::cout << "a => " << mymap.find('a')->second << '\n';
 
 // 范围查询
-std::map<char,int>::iterator itLow = mymap.lower_bound ('b'); // 等于或大于'b'
-std::map<char,int>::iterator itUp = mymap.upper_bound ('d');   // 大于'd'
+std::map<char,int>::iterator itLow = mymap.lower_bound('b'); // 等于或大于'b'
+std::map<char,int>::iterator itUp = mymap.upper_bound('d');   // 大于'd'
 mymap.erase(itLow, itUp);        // erases [itLow, itUp)
 
 ```
@@ -256,8 +256,7 @@ for (auto it = mymap.cbegin(); it != mymap.cend(); ++it)
     std::cout << " " << it->first << ":" << it->second; // cannot modify *it
 
 
-for (unsigned i = 0; i < mymap.bucket_count(); ++i)
-{
+for (unsigned i = 0; i < mymap.bucket_count(); ++i){
     std::cout << "bucket #" << i << " contains:";
     for (auto local_it = mymap.cbegin(i); local_it != mymap.cend(i); ++local_it)
         std::cout << " " << local_it->first << ":" << local_it->second;
@@ -274,10 +273,10 @@ mymap.at("Saturn") += 272;
 mymap.at("Jupiter") = mymap.at("Saturn") + 9638;
 
 // 插入
-std::unordered_map<std::string,double> myrecipe, mypantry = {{"milk",2.0},{"flour",1.5}};
-std::pair<std::string,double> myshopping ("baking powder",0.3);
+std::unordered_map <std::string, double> myrecipe, mypantry = {{"milk",2.0},{"flour",1.5}};
+std::pair <std::string, double> myshopping ("baking powder",0.3);
 myrecipe.insert(myshopping);                        // copy insertion
-myrecipe.insert(std::make_pair<std::string,double>("eggs",6.0)); // move insertion
+myrecipe.insert(std::make_pair <std::string, double>("eggs",6.0)); // move insertion
 myrecipe.insert(mypantry.begin(), mypantry.end());  // range insertion
 myrecipe.insert({{"sugar",0.8},{"salt",0.1}});    // initializer list insertion
 
@@ -316,6 +315,9 @@ v1.pop_back();
 v1.insert(v1.end(), 4);
 v1.erase(v1.begin() + 1);
 v1.erase(v1.begin(), v1.begin() + 2);
+int x = 5;
+v1.erase(std::remove_if(v1.begin(), v1.end(), [x](int n) { return n < x; } ), v1.end());
+
 v1.assign(2, 10);
 // 第二个位置后边插入5
 v.insert(std::next(std::begin(v), 2), 5);
@@ -380,6 +382,14 @@ std::vector<int> d {100, 200, 300};
 std::vector<int> v {1, 2, 3, 4, 5};
 std::copy(d.begin(), d.end(), std::inserter(v, std::next(v.begin())));
 // v: 1 100 200 300 2 3 4 5
+
+// 过滤
+std::unordered_set<int> filterSet(std::begin(v), std::end(v));
+std::vector<int> ret;
+std::copy_if(std::begin(d), std::end(d), std::inserter(ret, std::begin(ret)), [&filterSet](auto item) {
+    return filterSet.find(item) == std::end(filterSet);
+});
+return ret;
 ```
 
 #### 8、类型转换
@@ -572,4 +582,111 @@ std::random_device rd;
 std::mt19937 gen(rd());
 // [0-9]之间的随机数
 int rnd = std::uniform_int_distribution<> dis(0, 9)(gen);
+```
 
+#### 14、类型转换cast
+``` c++
+// 1、static_cast 
+// 1.1 基本数据类型之间的转换 
+float pi = 3.1415;
+int a = static_cast<int>(pi);
+// 1.2 void*与目标类型的指针间的转换
+int n = 10;
+void *pv = &n;
+int *p = static_cast<int*>(pv);
+
+int n = 10;
+int *pn = &n;
+void *pv = static_cast<void*>(pn);
+int *p = static_cast<int*>(pv);
+// 1.3 基类与派生类指针或引用类型之间的转换
+Base *pb2 = new Derived;
+Derived *pd2 = static_cast<Derived*>(pb2);
+pd2->func(); 
+
+Derived *pd3 = new Derived;
+Base *pb3 = static_cast<Base*>(pd3);
+pb3->print(); 
+
+// const_cast
+const Student *pa = new Student;
+Student *pb = const_cast<Student*>(pa);
+pb->v = 100;
+// pa、pb指向同一个对象
+std::cout << pa->v << "\n" << pb->v << std::endl;
+
+const Student &refa = *pa;
+Student &refb = const_cast<Student&>(refa);
+refb.v = 200;
+// refa、refb引用同一个对象
+std::cout << refa.v << "\n" << refb.v << std::endl;
+```
+
+#### 15、基本类型的最大最小值
+``` c++
+#include <limits>
+#include <iostream>
+std::cout << "short: " << std::dec << std::numeric_limits<short>::max()
+          << " or " << std::hex << std::showbase << std::numeric_limits<short>::max() << '\n'
+          << "int: " << std::dec << std::numeric_limits<int>::max()
+          << " or " << std::hex << std::numeric_limits<int>::max() << '\n' << std::dec
+          << "size_t: " << std::dec << std::numeric_limits<std::size_t>::max()
+          << " or " << std::hex << std::numeric_limits<std::size_t>::max() << '\n'
+          << "float: " << std::numeric_limits<float>::max()
+          << " or " << std::hexfloat << std::numeric_limits<float>::max() << '\n'
+          << "double: " << std::defaultfloat << std::numeric_limits<double>::max()
+          << " or " << std::hexfloat << std::numeric_limits<double>::max() << '\n';
+
+short: 32767 or 0x7fff
+int: 2147483647 or 0x7fffffff
+size_t: 18446744073709551615 or 0xffffffffffffffff
+float: 3.40282e+38 or 0x1.fffffep+127
+double: 1.79769e+308 or 0x1.fffffffffffffp+1023
+
+```
+
+#### 16、push vs emplace
+``` c++
+std::vector<std::string> v;
+v.reserve(1000);
+// 1 push_back(const string&)，参数是左值引用
+for (int i = 0; i < count; i++) {
+  std::string temp("ceshi");
+  v.push_back(temp);  
+}
+// 2 push_back(string &&), 参数是右值引用
+for (int i = 0; i < count; i++) {
+  std::string temp("ceshi");
+  v.push_back(std::move(temp));
+}
+// 3 push_back(string &&), 参数是右值引用
+for (int i = 0; i < count; i++) {
+  v.push_back("ceshi");
+}
+// 4 只有一次构造函数，不调用拷贝构造函数，速度最快
+for (int i = 0; i < count; i++) {
+  v.emplace_back("ceshi");
+}
+// 1 耗时最长，将调用左值引用的push_back，且将会调用一次string的拷贝构造函数
+// 2 3 4 调用string的移动构造函数，移动构造函数耗时比拷贝构造函数少，因为不需要重新分配内存空间
+// 5 emplace_back只调用构造函数，没有移动构造函数，也没有拷贝构造函数
+
+
+// emplace 最大的作用是避免产生不必要的临时变量，因为它可以完成 in place 的构造
+struct Foo {
+    Foo(int n, double x);
+};
+
+std::vector<Foo> v;
+v.emplace(it, 42, 3.1416);        // 没有临时变量产生
+v.insert(it, Foo(42, 3.1416));    // 需要产生一个临时变量
+v.insert(it, {42, 3.1416});       // 需要产生一个临时变量
+```
+
+#### 17、for_each
+``` c++
+std::vector<int> nums{3, 4, 2, 8, 15, 267};
+auto print = [](const int& n) { std::cout << " " << n; };
+std::for_each(nums.cbegin(), nums.cend(), print);
+std::for_each(nums.begin(), nums.end(), [](int &n){ n++; });
+```
