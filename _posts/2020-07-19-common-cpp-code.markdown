@@ -50,6 +50,7 @@ std::chrono::milliseconds ms{3};
 std::chrono::microseconds us = 2 * ms; 
 // 获取时间间隔的时钟周期个数
 std::cout <<  "3 ms duration has " << ms.count() << " ticks\n"<<  "6000 us duration has " << us.count() << " ticks\n";
+std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 // std::ratio代表的是一个分子除以分母的分数值，比如ratio<2>代表一个时钟周期是两秒，ratio<60>代表了一分钟，ratio<60*60>代表一个小时，ratio<60*60*24>代表一天。
 // 30Hz clock using fractional ticks
@@ -307,7 +308,13 @@ std::vector<int> v4(10,1);   //初始化了10个值为1的元素
 int a[5] = { 1, 2, 3, 4, 5 };
 std::vector<int> v5(a, a + 5); //通过数组a的地址下标初始化
 std::vector<int> v6(v5); // 通过c1初始化
-std::vector<int> c7(c1.begin(), c1.begin() + 3);
+std::vector<int> v7(c1.begin(), c1.begin() + 3);
+
+std::vector<int> v(10);
+std::iota(v.begin(), v.end(), 19); // iota 对容器内的元素按序递增 19为初始值
+for (auto n : v) 
+    std::cout << n << ' ';
+// 19 20 21 22 23 24 25 26 27 28
 
 // 写入删除
 v1.push_back(1);     
@@ -316,6 +323,7 @@ v1.insert(v1.end(), 4);
 v1.erase(v1.begin() + 1);
 v1.erase(v1.begin(), v1.begin() + 2);
 int x = 5;
+// 所有小于5的元素移除
 v1.erase(std::remove_if(v1.begin(), v1.end(), [x](int n) { return n < x; } ), v1.end());
 
 v1.assign(2, 10);
@@ -384,12 +392,34 @@ std::copy(d.begin(), d.end(), std::inserter(v, std::next(v.begin())));
 // v: 1 100 200 300 2 3 4 5
 
 // 过滤
-std::unordered_set<int> filterSet(std::begin(v), std::end(v));
-std::vector<int> ret;
-std::copy_if(std::begin(d), std::end(d), std::inserter(ret, std::begin(ret)), [&filterSet](auto item) {
-    return filterSet.find(item) == std::end(filterSet);
+#include <vector>
+#include <unordered_set>
+#include <iostream>
+#include <iterator>
+#include <algorithm> // std::copy_if std::transform
+const std::vector <uint64_t> candidates{1, 2, 3, 4, 5, 6};
+const std::vector <uint64_t> filterList{2, 3};
+const std::unordered_set <uint64_t> filterSet(filterList.cbegin(), filterList.cend());
+std::vector <uint64_t> filterResList;
+filterResList.reserve(filterList.size());
+std::copy_if(candidates.cbegin(), candidates.cend(), std::inserter(filterResList, filterResList.begin()),
+          [&filterSet](const uint64_t item) {
+              return filterSet.count(item) == 0;
+          });
+std::vector<std::string> res;
+res.reserve(filterResList.size());
+std::transform(filterResList.cbegin(), filterResList.cend(), std::inserter(res, res.begin()),
+               static_cast<std::string (*)(uint64_t)>(std::to_string));
+std::copy(res.begin(), res.end(), std::ostream_iterator<std::string>(std::cout, ","));
+
+
+// 也可以使用erase + remove_if 过滤
+std::vector <uint64_t> candidates{1, 2, 3, 4, 5, 6};
+auto it = std::remove_if(std::begin(candidates), std::end(candidates), [&filterSet](const uint64_t& item){
+    return filterSet.count(item) != 0;
 });
-return ret;
+candidates.erase(it, candidates.end());
+
 ```
 
 #### 8、类型转换
@@ -689,4 +719,56 @@ std::vector<int> nums{3, 4, 2, 8, 15, 267};
 auto print = [](const int& n) { std::cout << " " << n; };
 std::for_each(nums.cbegin(), nums.cend(), print);
 std::for_each(nums.begin(), nums.end(), [](int &n){ n++; });
+```
+
+#### 18、别名模板
+``` c++
+
+/*
+ * Composition is now a tuple with an int as the fixed first type
+ * see also the default function templates example
+ */
+template <class ... Types>
+using Composition = std::tuple<int, Types ...>;
+Composition<float, string> composition(1, 2.3f, "name");
+std::cout << std::get<0>(composition) << std::endl;
+std::cout << std::get<1>(composition) << std::endl;
+std::cout << std::get<2>(composition) << std::endl;
+
+
+#include <iostream>
+#include <tuple>
+/*
+ * Default first type of the tuple is int; opt. specify other type
+ * see also the alias templates example
+ */
+template<class Key = int, class ... Types>
+std::tuple<Key, Types ...> makeComposition(Key key, Types ... types) {
+    return std::make_tuple(key, types ...);
+}
+auto composition = makeComposition(1, 2.3f, "name");
+std::cout << std::get<0>(composition) ;
+std::cout << std::get<1>(composition) ;
+std::cout << std::get<2>(composition) ;
+
+
+
+/*
+ * If there's more than one item we split the first one (head) off
+ * and continue with the rest (tail) recursively until we are done
+ */
+template <class Head>
+void processItem(Head item) {
+  std::cout << item << std::endl;
+}
+template <class Head, class ... Tail>
+void processItem(Head item, Tail ... tail) {
+  processItem(item);
+  processItem(tail ...);
+}
+int main() {
+  processItem("Hello", "my friend", "how are you", "today?");
+  processItem("Look at all those fancy types", 1, 2.3f);
+}
+
 ```
