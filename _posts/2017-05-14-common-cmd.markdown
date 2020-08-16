@@ -22,12 +22,12 @@ env
 
 ####  查看当前用户的计划任务
 ``` sh
-crontab   -l
+crontab -l
 ```
 
 ####   查看挂接的分区状态
 ``` sh
-mount | column   -t
+mount | column -t
 ```
 
 ####   查看所有分区
@@ -50,12 +50,12 @@ du -s * | sort -nr | head
 
 ####   查看所有交换分区
 ``` sh
-swapon  -s
+swapon -s
 ```
 
 ####   查看内存使用量和交换区使用量
 ``` sh
-free   -m
+free -m
 ```
 
 ####   查看内存总量
@@ -71,11 +71,6 @@ grep   MemFree  /proc/meminfo
 ####  查看磁盘参数
 ``` sh
 hdparm   -i    /dev/hda
-```
-
-####  查看启动时IDE设备检测状况
-``` sh
-dmesg | grep IDE
 ```
 
 ####  查看系统负载
@@ -159,11 +154,26 @@ mtime即modify time，指文件内容被修改的时间
 tail -f -n 5 my_server_log
 ```
 
+#### 分析占用内存过高的进程
+``` sh
+top -cbo +%MEM | head -n 20 | tail -15
+ps aux --sort -rss | head
+
+ps -aux | sort -nrk3 | head -n 10
+```
+
 ####  分析CPU过高的java线程
 ``` sh
+ps -aux | sort -nrk3 | head -n 10
+
 top -n1 -H | grep -m1 java
 printf "%x" $PID
 jstack $PID | grep -A500 $NID | grep -m1 "^$" -B 500
+```
+
+#### 更改文件所述用户和组
+``` sh
+chown changdong:xx_group project_dir -R
 ```
 
 ####  十进制与十六进制互转
@@ -1326,7 +1336,18 @@ git remote show origin
 远程删除了分支本地也删除
 git remote prune origin
 
+```
 
+##### 拉取更新子模块
+``` sh
+git submodule update --init --recursive
+```
+
+##### 拉取远程分支
+``` sh
+// --track is shorthand for git checkout -b [branch] [remotename]/[branch]
+git fetch --all
+git checkout --track origin/daves
 ```
 
 #### log
@@ -1355,3 +1376,44 @@ function log_error()
 }
 ```
 
+#### docker
+##### docker 镜像
+``` sh
+列出本地主机上的镜像
+docker images
+
+下载镜像
+docker pull ubuntu
+
+删除镜像
+dokcer rmi -f b655e15959b7
+docker rmi -f ${docker images -qa}
+
+根据Dockerfile构建镜像
+从当前路径的Dockerfile构建 镜像名称为dongdong，版本为v1.0
+docker build --no-cache -t dongdong:v1.0 .
+
+```
+##### docker 容器
+``` sh
+创建容器
+docker run -dit --restart unless-stopped --name dongdong -v /data/dongdong/workspace:/workspace -v /data/dongdong/data:/data/src centos
+
+-i 允许对容器交互 -t 在新容器内指定一个终端 -d 后台运行
+-v 目录挂载 主机目录:docker容器目录
+-name 容器名字
+
+容器列表
+docker ps 
+
+启动停止容器
+docker start[stop,restar,kill] dongdong
+
+删除容器
+docker stop dongdong
+docker rm dongdong
+
+进入容器
+docker exec -it --env COLUMNS=`tput cols` --env LINES=`tput lines` dongdong /bin/bash 
+
+```

@@ -11,7 +11,7 @@ tags:
 
 
 #### 1、数组长度
-``` c++
+``` cpp
 #if !defined(ARRAY_SIZE)
 #define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
 #endif
@@ -21,7 +21,7 @@ ARRAY_SIZE(percents)
 ```
 
 #### 2、二分查找
-``` c++
+``` cpp
 // std::lower_bound 在first和last中的前闭后开区间进行二分查找，返回大于或等于val的第一个元素的iterator位置。如果所有元素都小于val，则返回last的iterator位置。
 #include <algorithm>
 float percentLineNorm(uint32_t *percents, size_t size, uint32_t value) {
@@ -43,7 +43,7 @@ std::cout << pct << std::endl;
 ```
 
 #### 3、日期和时间库
-``` c++
+``` cpp
 #include <chrono>
 // 时间间隔Duration
 std::chrono::milliseconds ms{3}; 
@@ -101,7 +101,7 @@ std::cout << std::put_time(std::localtime(&t), "%Y-%m-%d %H.%M.%S") << std::endl
 ```
 
 #### 4、unordered_set
-``` c++
+``` cpp
 // set和unordered_set底层分别是用红黑树和哈希表实现的
 #include <unordered_set>
 
@@ -172,7 +172,7 @@ std::cout << "key_eq: " << equal(11111, 11111) << std::endl;
 ```
 
 #### 5、map
-``` c++
+``` cpp
 // std::map 通常由二叉搜索树实现。
 // 默认构造，构造一个空的map
 std::map<char, int> m1;
@@ -229,14 +229,14 @@ if (it != mymap.end())
 std::cout << "a => " << mymap.find('a')->second << '\n';
 
 // 范围查询
-std::map<char,int>::iterator itLow = mymap.lower_bound('b'); // 等于或大于'b'
-std::map<char,int>::iterator itUp = mymap.upper_bound('d');   // 大于'd'
-mymap.erase(itLow, itUp);        // erases [itLow, itUp)
+std::map<char,int>::iterator it_low = mymap.lower_bound('b'); // 等于或大于'b'
+std::map<char,int>::iterator it_up = mymap.upper_bound('d');   // 大于'd'
+mymap.erase(it_low, it_up);        // erases [it_low, it_up)
 
 ```
 
 #### 6、unordered_map 
-``` c++
+``` cpp
 #include <string>
 #include <unordered_map>
 
@@ -297,15 +297,15 @@ else
 ```
 
 #### 7、vector
-``` c++
+``` cpp
 // 大小可动态改变的顺序容器
 #include<vector>
 // 定义初始化
-std::vector<int> v1{1,2,3};
-std::vector<std::vector<int>> v2{{1,2,3},{4,5,6}};
+std::vector<int> v1{1, 2, 3};
+std::vector<std::vector<int>> v2{{1, 2, 3},{4, 5, 6}};
 std::vector<int> v3(10);     //初始化了10个默认值为0的元素
-std::vector<int> v4(10,1);   //初始化了10个值为1的元素
-int a[5] = { 1, 2, 3, 4, 5 };
+std::vector<int> v4(10, 1);   //初始化了10个值为1的元素
+int a[5] = {1, 2, 3, 4, 5};
 std::vector<int> v5(a, a + 5); //通过数组a的地址下标初始化
 std::vector<int> v6(v5); // 通过c1初始化
 std::vector<int> v7(c1.begin(), c1.begin() + 3);
@@ -377,13 +377,24 @@ std::mt19937 rand;
 std::shuffle(std::begin(v1), std::end(v1), rand);
 
 // map转pair后排序 
-using PairVector = std::vector<std::pair<uint64_t, uint64_t>>;
-std::unordered_map<uint64_t, uint64_t> tagMap{{11, 22}, {1111, 2222}, {111, 222}};
-PairVector tagsVec(std::make_move_iterator(std::begin(tagMap)), std::make_move_iterator(std::end(tagMap)));
-auto compare = [](const PairVector::value_type &prev, const PairVector::value_type &next) {
-    return prev.second > next.second;
-};
-std::sort(tagsVec.begin(), tagsVec.end(), compare);
+template <typename K, typename V>
+std::vector<K> top_keys_by_value(const std::unordered_map<K, V> &map, uint32_t size = 0) {
+    std::vector<std::pair<K, V>> pair_vec{std::begin(map), std::end(map)};
+    // std::vector<std::pair<K, V>> pair_vec{std::make_move_iterator(std::begin(map)), std::make_move_iterator(std::end(map))};
+    std::sort(std::begin(pair_vec), std::end(pair_vec), [](std::pair<K, V> &p1, std::pair<K, V> &p2) {
+        return p1.second > p2.second;
+    });
+    if (size != 0 && pair_vec.size() > size) {
+        pair_vec.resize(size);
+    }
+    std::vector<K> top_keys;
+    std::transform(std::begin(pair_vec), std::end(pair_vec),
+            std::inserter(top_keys, std::begin(top_keys)), [](const std::pair<K, V> &p) {
+        return p.first;
+    });
+    return top_keys;
+}
+
 
 // inserter
 std::vector<int> d {100, 200, 300};
@@ -398,32 +409,31 @@ std::copy(d.begin(), d.end(), std::inserter(v, std::next(v.begin())));
 #include <iterator>
 #include <algorithm> // std::copy_if std::transform
 const std::vector <uint64_t> candidates{1, 2, 3, 4, 5, 6};
-const std::vector <uint64_t> filterList{2, 3};
-const std::unordered_set <uint64_t> filterSet(filterList.cbegin(), filterList.cend());
-std::vector <uint64_t> filterResList;
-filterResList.reserve(filterList.size());
-std::copy_if(candidates.cbegin(), candidates.cend(), std::inserter(filterResList, filterResList.begin()),
-          [&filterSet](const uint64_t item) {
-              return filterSet.count(item) == 0;
-          });
+const std::vector <uint64_t> filter_list{2, 3};
+const std::unordered_set <uint64_t> filter_set(filter_list.cbegin(), filter_list.cend());
+std::vector <uint64_t> filter_res_list;
+filter_res_list.reserve(filter_list.size());
+std::copy_if(candidates.cbegin(), candidates.cend(), std::inserter(filter_res_list, filter_res_list.begin()),[&filter_set](const uint64_t item) {
+                 return filter_set.count(item) == 0;
+             });
 std::vector<std::string> res;
-res.reserve(filterResList.size());
-std::transform(filterResList.cbegin(), filterResList.cend(), std::inserter(res, res.begin()),
-               static_cast<std::string (*)(uint64_t)>(std::to_string));
+res.reserve(filter_res_list.size());
+std::transform(filter_res_list.cbegin(), filter_res_list.cend(), std::inserter(res, res.begin()), static_cast<std::string (*)(uint64_t)>(std::to_string));
 std::copy(res.begin(), res.end(), std::ostream_iterator<std::string>(std::cout, ","));
 
 
 // 也可以使用erase + remove_if 过滤
-std::vector <uint64_t> candidates{1, 2, 3, 4, 5, 6};
-auto it = std::remove_if(std::begin(candidates), std::end(candidates), [&filterSet](const uint64_t& item){
-    return filterSet.count(item) != 0;
+std::vector<uint64_t> vec{1, 2, 2, 4, 3, 4};
+std::unordered_set<uint64_t> filter_set = {2, 3};
+auto it = std::remove_if(std::begin(vec), std::end(vec), [&filter_set](const uint64_t &item) {
+    return filter_set.count(item) != 0;
 });
-candidates.erase(it, candidates.end());
-
+vec.erase(it, vec.end());
+std::copy(vec.cbegin(), vec.cend(), std::ostream_iterator<uint64_t>(std::cout, "\t"));
 ```
 
 #### 8、类型转换
-``` c++
+``` cpp
 #include <string>
 // 字符串转数字
 std::string str_hex = "40c3";
@@ -459,7 +469,7 @@ const unsigned char * pTmp = (const unsigned char *)pBuf;
 ```
 
 #### 8、智能指针
-``` c++
+``` cpp
 #include <memeory>
 
 std::unique_pt<Peron> test()
@@ -517,7 +527,7 @@ if (!p1)
 ```
 
 #### 9、匿名函数
-``` c++
+``` cpp
 // [捕获列表](参数列表) -> 返回类型 {函数体}
 int c = 12;
 auto add = [c](int a, int b) -> int {
@@ -530,7 +540,7 @@ auto add = [&c](int a, int b) -> int {
 ```
 
 #### 10、future
-``` c++
+``` cpp
 #include <iostream>
 #include <future>
 #include <thread>
@@ -568,7 +578,7 @@ fut.get();
 ```
 
 #### 11、结构体对象创建
-``` c++
+``` cpp
 struct Student { 
     std::string name;
     char sex;
@@ -581,7 +591,7 @@ std::cout << stu2.name << " " << stu2.sex << " " << stu2.age << "\n";
 ```
 
 #### 12、 transform
-``` c++
+``` cpp
 std::string s("hello");
 std::transform(s.begin(), s.end(), s.begin(),
                [](unsigned char c) -> unsigned char { return std::toupper(c); });
@@ -597,7 +607,7 @@ std::transform(ordinals.cbegin(), ordinals.cend(), ordinals.cbegin(),
 ```
 
 #### 13、random
-``` c++
+``` cpp
 #include <random>
 #include <algorithm>
 #include <iterator>
@@ -615,7 +625,7 @@ int rnd = std::uniform_int_distribution<> dis(0, 9)(gen);
 ```
 
 #### 14、类型转换cast
-``` c++
+``` cpp
 // 1、static_cast 
 // 1.1 基本数据类型之间的转换 
 float pi = 3.1415;
@@ -653,7 +663,7 @@ std::cout << refa.v << "\n" << refb.v << std::endl;
 ```
 
 #### 15、基本类型的最大最小值
-``` c++
+``` cpp
 #include <limits>
 #include <iostream>
 std::cout << "short: " << std::dec << std::numeric_limits<short>::max()
@@ -676,7 +686,7 @@ double: 1.79769e+308 or 0x1.fffffffffffffp+1023
 ```
 
 #### 16、push vs emplace
-``` c++
+``` cpp
 std::vector<std::string> v;
 v.reserve(1000);
 // 1 push_back(const string&)，参数是左值引用
@@ -714,7 +724,7 @@ v.insert(it, {42, 3.1416});       // 需要产生一个临时变量
 ```
 
 #### 17、for_each
-``` c++
+``` cpp
 std::vector<int> nums{3, 4, 2, 8, 15, 267};
 auto print = [](const int& n) { std::cout << " " << n; };
 std::for_each(nums.cbegin(), nums.cend(), print);
@@ -722,8 +732,7 @@ std::for_each(nums.begin(), nums.end(), [](int &n){ n++; });
 ```
 
 #### 18、别名模板
-``` c++
-
+``` cpp
 /*
  * Composition is now a tuple with an int as the fixed first type
  * see also the default function templates example
@@ -750,7 +759,6 @@ auto composition = makeComposition(1, 2.3f, "name");
 std::cout << std::get<0>(composition) ;
 std::cout << std::get<1>(composition) ;
 std::cout << std::get<2>(composition) ;
-
 
 
 /*

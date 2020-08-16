@@ -861,6 +861,9 @@ select * from q1;
 
 ```
 
-
+#### 47、presto获取表路径
+``` sql
+select "$path" from dws_table;
+```
 
 
