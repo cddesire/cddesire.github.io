@@ -262,8 +262,7 @@ for (unsigned i = 0; i < mymap.bucket_count(); ++i){
 }
 
 // 访问
-std::unordered_map<std::string, int> mymap = {
-        {"Mars", 3000}, {"Saturn", 60000},  {"Jupiter", 70000}};
+std::unordered_map<std::string, int> mymap;
 // 使用方括号（[]）：如果 k 匹配容器中某个元素的键，则该函数返回该映射值的引用。如果 k 与容器中任何元素的键都不匹配，则该函数将使用该键插入一个新元素，并返回该映射值的引用。
 // 使用at：如果 k 匹配容器中某个元素的键，则该函数返回该映射值的引用。如果 k 与容器中任何元素的键都不匹配，则该函数将抛出 out_of_range 异常。
 mymap["Mars1"] = 3396;
@@ -271,12 +270,11 @@ mymap.at("Saturn") += 272;
 mymap.at("Jupiter") = mymap.at("Saturn") + 9638;
 
 // 插入
-std::unordered_map <std::string, double> myrecipe, mypantry = {{"milk",2.0},{"flour",1.5}};
-std::pair <std::string, double> myshopping ("baking powder",0.3);
+std::unordered_map <std::string, double> myrecipe, mypantry;
+std::pair <std::string, double> myshopping ("baking powder", 0.3);
 myrecipe.insert(myshopping);                        // copy insertion
-myrecipe.insert(std::make_pair <std::string, double>("eggs",6.0)); // move insertion
+myrecipe.insert(std::make_pair<std::string, double>("eggs",6.0)); // move insertion
 myrecipe.insert(mypantry.begin(), mypantry.end());  // range insertion
-myrecipe.insert({{"sugar",0.8},{"salt",0.1}});    // initializer list insertion
 
 // 删除
 mymap.erase(mymap.begin());                    // erasing by iterator
