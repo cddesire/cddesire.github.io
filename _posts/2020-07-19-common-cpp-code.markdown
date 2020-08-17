@@ -297,7 +297,6 @@ else
 #include<vector>
 // 定义初始化
 std::vector<int> v1{1, 2, 3};
-std::vector<std::vector<int>> v2{{1, 2, 3},{4, 5, 6}};
 std::vector<int> v3(10);     //初始化了10个默认值为0的元素
 std::vector<int> v4(10, 1);   //初始化了10个值为1的元素
 int a[5] = {1, 2, 3, 4, 5};
@@ -340,7 +339,7 @@ std::cout << v1.front() << v1.back() << std::endl;
 
 // 排序
 #include<algorithm>
-int a[10] = { 9,6,3,8,5,2,7,4,1,0 };
+int a[10] = {9, 6, 3, 8, 5, 2, 7, 4, 1, 0};
 sort(a, a + 10, std::less<int>()); // 升序
 sort(a, a + 10, std::greater<int>()); // 降序
 
