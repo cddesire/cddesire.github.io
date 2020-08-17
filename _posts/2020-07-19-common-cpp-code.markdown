@@ -156,7 +156,7 @@ c.swap(c2);
 
 // 查找
 std::unordered_set<int>::iterator find_iter = c4.find(2);
-if (find_iter != c4.end()){
+if (find_iter != c4.end()) {
     std::cout << "找到元素 : " << *find_iter << std::endl;
 } else {
     std::cout << "没找到 !" << std::endl;
@@ -243,10 +243,8 @@ mymap.erase(it_low, it_up);        // erases [it_low, it_up)
 // 初始化
 typedef std::unordered_map<std::string, std::string> stringmap;
 std::unordered_map<std::string, std::string> m1; // empty
-std::unordered_map<std::string, std::string> m2({{"apple", "red"}, {"lemon", "yellow"}});      // init list
-std::unordered_map<std::string, std::string> m3({{"orange", "orange"}, {"strawberry", "red"}}); // init list
-std::unordered_map<std::string, std::string> m4(m2);                                       // copy
-std::unordered_map<std::string, std::string> m5(m4.begin(), m4.end());                  // range
+std::unordered_map<std::string, std::string> m4(m2); // copy
+std::unordered_map<std::string, std::string> m5(m4.begin(), m4.end()); // range
 for (auto &x : m5)
     std::cout << " " << x.first << ":" << x.second;
 

@@ -109,9 +109,16 @@ tags:
 -  中文乱码      set LANG=zh_CN.UTF8 或者命令 chcp 65001
 
 
-### VSCode （windows）
-- 删除整行	ctrl+shift+k
-- 变量重命名	ctrl+F2
+### VSCode 
+- 打开快捷键一览表 Ctrl(Command) + K + S
+- 切换工作区 Ctrl(Command) + R
+- 跳转到指定行 Ctrl(Control) + G
+- 转到文件 Ctrl(Command) + P
+- 选择内容格式化  Ctrl(Command) + K + F
+- 转到定义  Fn + F12
+- 变量重命名 Fn + F2
+- 列出函数名 Ctrl + Shift + O
+- 删除整行	Ctrl + Shift + K
 
 
 ### VI
