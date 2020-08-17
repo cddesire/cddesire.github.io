@@ -250,7 +250,6 @@ for (auto &x : m5)
 
 // 迭代器操作
 std::unordered_map<std::string, std::string> mymap;
-mymap = {{"Australia", "Canberra"}, {"U.S.", "Washington"}, {"France", "Paris"}};
 for (auto it = mymap.cbegin(); it != mymap.cend(); ++it)
     std::cout << " " << it->first << ":" << it->second; // cannot modify *it
 
