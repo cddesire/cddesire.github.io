@@ -184,8 +184,8 @@ m1['d'] = 70;
 std::map<char, int> m2(m1.begin(), m1.end());
 // 复制构造
 std::map<char, int> m3(m2);
-// 指定比较器：使用类
-std::map<char, int, classcomp> m4; 
+// 指定比较器：使用类 std::greater 降序的方式
+std::map<char, int, std::greater<char>> m4; 
 // 指定比较器：使用函数指针
 bool (*fn_pt)(char, char) = fncomp;
 std::map<char, int, bool (*)(char, char)> m5(fn_pt); 
@@ -252,7 +252,6 @@ for (auto &x : m5)
 std::unordered_map<std::string, std::string> mymap;
 for (auto it = mymap.cbegin(); it != mymap.cend(); ++it)
     std::cout << " " << it->first << ":" << it->second; // cannot modify *it
-
 
 for (unsigned i = 0; i < mymap.bucket_count(); ++i){
     std::cout << "bucket #" << i << " contains:";
@@ -436,6 +435,9 @@ std::string str_auto = "0x7f";
 int i_hex = std::stoi(str_hex, nullptr, 16);
 int i_bin = std::stoi(str_bin, nullptr, 2);
 int i_auto = std::stoi(str_auto, nullptr, 0);
+
+std::string str = "";
+uint32_t ts = static_cast<uint32_t>(std::strtoul(str, nullptr, 10));
 
 long stol (const string&  str, size_t* idx = 0, int base = 10);
 unsigned long stoul (const string&  str, size_t* idx = 0, int base = 10);

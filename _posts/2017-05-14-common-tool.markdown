@@ -117,8 +117,9 @@ tags:
 - 选择内容格式化  Ctrl(Command) + K + F
 - 转到定义  Fn + F12
 - 变量重命名 Fn + F2
-- 列出函数名 Ctrl + Shift + O
+- 列出函数名 Ctrl + Shift + O  Ctrl + P + @
 - 删除整行	Ctrl + Shift + K
+- 查找类  Ctrl + T   Ctrl + P + #
 
 
 ### VI
