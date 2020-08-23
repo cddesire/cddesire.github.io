@@ -163,6 +163,10 @@ if (find_iter != c4.end()) {
 }
 std::cout << "value出现次数 :" << c4.count(2) << std::endl; //set key不可重复
 
+c4.find(2);  // O(1)
+c4.count(2);  // O(1)
+std::find(c4.begin(), c4.end(), 2); // O(n)
+
 
 std::unordered_set<int>::hasher func = c.hash_function();
 std::unordered_set<int>::key_equal equal = c.key_eq();
@@ -280,12 +284,10 @@ mymap.erase(mymap.begin());                    // erasing by iterator
 mymap.erase("France");                         // erasing by key
 mymap.erase(mymap.find("China"), mymap.end()); // erasing by range
 
-// 查找
+// 是否存在
 std::unordered_map<std::string, std::string>::const_iterator got = mymap.find("France");
-if (got == mymap.end())
-  std::cout << "not found";
-else
-  std::cout << got->first << " is " << got->second;
+mymap.find("France") != mymap.end();
+mymap.count("France") == 1;
 
 ```
 
@@ -304,9 +306,7 @@ std::vector<int> v7(c1.begin(), c1.begin() + 3);
 
 std::vector<int> v(10);
 std::iota(v.begin(), v.end(), 19); // iota 对容器内的元素按序递增生成序列 19为初始值
-for (auto n : v) 
-    std::cout << n << ' ';
-// 19 20 21 22 23 24 25 26 27 28
+
 
 // 写入删除
 v1.push_back(1);     
@@ -398,10 +398,10 @@ std::copy(d.begin(), d.end(), std::inserter(v, std::next(v.begin())));
 #include <iostream>
 #include <iterator>
 #include <algorithm> // std::copy_if std::transform
-const std::vector <uint64_t> candidates{1, 2, 3, 4, 5, 6};
-const std::vector <uint64_t> filter_list{2, 3};
-const std::unordered_set <uint64_t> filter_set(filter_list.cbegin(), filter_list.cend());
-std::vector <uint64_t> filter_res_list;
+const std::vector<uint64_t> candidates{1, 2, 3, 4, 5, 6};
+const std::vector<uint64_t> filter_list{2, 3};
+const std::unordered_set<uint64_t> filter_set(filter_list.cbegin(), filter_list.cend());
+std::vector<uint64_t> filter_res_list;
 filter_res_list.reserve(filter_list.size());
 std::copy_if(candidates.cbegin(), candidates.cend(), std::inserter(filter_res_list, filter_res_list.begin()),[&filter_set](const uint64_t item) {
                  return filter_set.count(item) == 0;
@@ -420,12 +420,20 @@ auto it = std::remove_if(std::begin(vec), std::end(vec), [&filter_set](const uin
 });
 vec.erase(it, vec.end());
 std::copy(vec.cbegin(), vec.cend(), std::ostream_iterator<uint64_t>(std::cout, "\t"));
+// 移除重复元素
+std::sort(vec.begin(), vec.end());
+vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
+
+// 元素是否存在
+std::find(vec.begint(), vec.end(), str) != vec.end()
+
+
 ```
 
 #### 8、类型转换
 ``` cpp
 #include <string>
-// 字符串转数字
+// 字符串转数字  
 std::string str_hex = "40c3";
 std::string str_bin = "-10010110001";
 std::string str_auto = "0x7f";
@@ -436,6 +444,7 @@ int i_auto = std::stoi(str_auto, nullptr, 0);
 std::string str = "";
 uint32_t ts = static_cast<uint32_t>(std::strtoul(str, nullptr, 10));
 
+// 字符串开始寻找数字或者正负号或者小数点，然后遇到非法字符终止，不会报异常
 long stol (const string&  str, size_t* idx = 0, int base = 10);
 unsigned long stoul (const string&  str, size_t* idx = 0, int base = 10);
 long long stoll (const string&  str, size_t* idx = 0, int base = 10);
@@ -443,6 +452,9 @@ unsigned long long stoull (const string&  str, size_t* idx = 0, int base = 10);
 float stof (const string&  str, size_t* idx = 0);
 double stod (const string&  str, size_t* idx = 0);
 long double stold (const string&  str, size_t* idx = 0);
+
+std::string str = "123.456";
+double d = std::stod(str);
 
 std::string orbits("686.97 365.24");
 std::string::size_type sz; // alias of size_t
@@ -456,8 +468,8 @@ const char *p = str.c_str();
 const char* p = "Hello world";
 std::string str = p;
 
-const char* pBuf = "hello world";
-const unsigned char * pTmp = (const unsigned char *)pBuf;
+const char *pBuf = "hello world";
+const unsigned char *pTmp = (const unsigned char *)pBuf;
 
 ```
 
@@ -465,8 +477,7 @@ const unsigned char * pTmp = (const unsigned char *)pBuf;
 ``` cpp
 #include <memeory>
 
-std::unique_pt<Peron> test()
-{
+std::unique_pt<Peron> test() {
     return std::unique_ptr<Person>(new Person());
 }
 // 只能有一个对象拥有这个所有权
@@ -512,8 +523,7 @@ p1.reset(); // 无参数调用reset，无关联指针，引用个数为0
 std::cout << "p1 Reference Count = " << p1.use_count() << std::endl;
 p1.reset(new int(11)); // 带参数调用reset，引用个数为1
 p1 = nullptr; // 把对象重置为NULL，引用计数为0
-if (!p1)
-{
+if (!p1) {
     std::cout << "p1 is NULL" << std::endl; // 输出
 }
 
@@ -772,4 +782,76 @@ int main() {
   processItem("Look at all those fancy types", 1, 2.3f);
 }
 
+```
+
+#### 19、字符串操作
+``` cpp
+// 包含
+std::string str1 = "hello world";
+std::string str2 = "world";
+bool contains = str1.find(str2) != std::string::npos;
+
+// 大小写转换
+std::string str1 = "Hello World";
+std::transform(str1.begin(), str1.end(), str1.begin(), ::tolower);
+std::transform(str1.begin(), str1.end(), str1.begin(), ::toupper);
+
+// 字符串替换
+std::string replaceAll(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+    return str;
+}
+std::string str1 = "Hello World";
+std::string str2 = replaceAll(str1, "l", "--");
+
+// 字符串分割
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::stringstream ss(s);
+    std::string item;
+    std::vector<std::string> elems;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+std::string str1 = "Hello World";
+std::vector<std::string> words = split(str1, ' ');
+```
+
+#### 20、vector元素最大值最小值
+``` cpp
+int max(const std::vector<int> &vec) {
+    if (vec.size() == 0) {
+        return 0;
+    }
+    return *std::max_element(vec.begin(), vec.end());
+}
+int maxIndex(const std::vector<int> &vec, int* index) {
+    if (vec.size() == 0) {
+        *index = 0;
+        return 0;
+    }
+    auto largest = std::max_element(vec.begin(), vec.end());
+    *index = std::distance(std::begin(vec), largest);
+    return *largest;
+}
+int min(const std::vector<int> &vec) {
+    if (vec.size() == 0) {
+        return 0;
+    }
+    return *std::min_element(vec.begin(), vec.end());
+}
+int minIndex(const std::vector<int> &vec, int* index) {
+    if (vec.size() == 0) {
+        *index = 0;
+        return 0;
+    }
+    auto smallest = std::min_element(vec.begin(), vec.end());
+    *index = std::distance(std::begin(vec), smallest);
+    return *smallest;
+}
 ```
