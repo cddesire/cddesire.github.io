@@ -280,7 +280,6 @@ mymap.erase(mymap.begin());                    // erasing by iterator
 mymap.erase("France");                         // erasing by key
 mymap.erase(mymap.find("China"), mymap.end()); // erasing by range
 
-
 // 查找
 std::unordered_map<std::string, std::string>::const_iterator got = mymap.find("France");
 if (got == mymap.end())
