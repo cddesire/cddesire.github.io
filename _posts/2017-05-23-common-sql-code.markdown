@@ -399,6 +399,10 @@ select from_unixtime(1511597988, 'yyyyMMdd') from dual; -- 20171125
 
 select to_date('2017-11-25 13:01:03') from dual; -- 2017-11-25
 
+-- 转成标准的yyyy-MM-dd格式
+select to_date(from_unixtime(unix_timestamp('20200808', 'yyyyMMdd')));    -- 2020-08-08
+select to_date(from_unixtime(unix_timestamp('2020 08 08', 'yyyy MM dd')));   -- 2020-08-08
+
 ```
 
 #### 21、避免用科学计数法表示浮点数

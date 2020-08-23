@@ -1298,6 +1298,8 @@ git push origin master
 ``` sh
 -i(interactive)模式展示，操作最近4次的提交
 git rebase -i head~4
+
+对于已经push的提交，先rebase，后git push -f 强制提交
 ```
 
 ##### git rebase VS git merge
@@ -1416,4 +1418,14 @@ docker rm dongdong
 进入容器
 docker exec -it --env COLUMNS=`tput cols` --env LINES=`tput lines` dongdong /bin/bash 
 
+```
+
+#### hdfs文件查看
+``` sh
+hadoop fs -cat /Data/Logs/2018-08-22/2018-08-22_log.lzo | lzop -dc
+
+hadoop fs -cat /shining/temp.txt.gz | gzip -d 
+hadoop fs -cat /shining/temp.txt.gz | zcat
+
+hadoop fs -cat /temp/b.bz2 | bzip2 -d
 ```
