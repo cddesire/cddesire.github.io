@@ -303,7 +303,7 @@ std::vector<int> v6(v5); // 通过c1初始化
 std::vector<int> v7(c1.begin(), c1.begin() + 3);
 
 std::vector<int> v(10);
-std::iota(v.begin(), v.end(), 19); // iota 对容器内的元素按序递增 19为初始值
+std::iota(v.begin(), v.end(), 19); // iota 对容器内的元素按序递增生成序列 19为初始值
 for (auto n : v) 
     std::cout << n << ' ';
 // 19 20 21 22 23 24 25 26 27 28
@@ -329,8 +329,7 @@ std::vector<int>::iterator it = v1.begin();
 std::cout << *it << *(it + 1) << std::endl;
 std::vector<int>::iterator it1 = v1.end();
 std::cout << *(it1 - 1) << std::endl;
-for(auto it = v1.begin(); it != v1.end(); it++)
-{
+for(auto it = v1.begin(); it != v1.end(); it++) {
     std::cout << (*it) << ' ';
 }
 std::cout << v1.front() << v1.back() << std::endl;
@@ -386,7 +385,6 @@ std::vector<K> top_keys_by_value(const std::unordered_map<K, V> &map, uint32_t s
     });
     return top_keys;
 }
-
 
 // inserter
 std::vector<int> d {100, 200, 300};
