@@ -67,36 +67,37 @@ typedef std::chrono::duration<int, std::ratio<60 * 60 * 24>> days_type;
 std::chrono::time_point<std::chrono::system_clock, days_type> today = std::chrono::time_point_cast<days_type>(std::chrono::system_clock::now());
 std::cout << today.time_since_epoch().count() << " days since epoch" << std::endl;
 
-// 时钟Clocks
-// 表示当前的系统时钟，内部有time_point, duration, Rep, Period等信息，它主要用来获取当前时间，以及实现time_t和time_point的相互转换。
-std::chrono::steady_clock::time_point t1 = std::chrono::system_clock::now();
-std::cout << "Hello World\n";
-std::chrono::steady_clock::time_point t2 = std::chrono:: system_clock::now();
-std::cout << (t2-t1).count()<<" tick count " << std::endl;
-cout << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<"microseconds";
 
 // 计算耗时
 using clk = std::chrono::system_clock;
 auto toMs = [](clk::duration duration) -> uint64_t {
     return std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000;
 };
-auto start = clk::now();
+std::chrono::steady_clock::time_point start = std::chrono::system_clock::now();
 // run code XXXX
-auto end = clk::now();
+std::chrono::steady_clock::time_point end = std::chrono::system_clock::now();
 uint64_t elpased = toMs(end - start);
 
 // time_point转换为ctime：
 std::time_t now_c = std::chrono::system_clock::to_time_t(time_point);
 // ctime 转 time_point
 std::chrono::system_clock::time_point time_point = std::chrono::system_clock::from_time_t(now_c);
+// unixtime标识 1588886970 2020/5/8 5:29:30
+std::chrono::system_clock::time_point time1(std::chrono::seconds(1578466970));
+
 
 // 时间的格式化输出
 #include <chrono>
 #include <ctime>
 #include <iomanip>
-auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 std::cout << std::put_time(std::localtime(&t), "%Y-%m-%d %X") << std::endl;
 std::cout << std::put_time(std::localtime(&t), "%Y-%m-%d %H.%M.%S") << std::endl;
+
+const std::chrono::system_clock::duration ttl = std::chrono::hours(24 * 7);
+const std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+const std::chrono::system_clock::time_point sevenDaysAgo = now - ttl;
+long start = std::chrono::duration_cast<std::chrono::seconds>(sevenDaysAgo.time_since_epoch()).count();
 
 ```
 
@@ -284,7 +285,7 @@ mymap.erase(mymap.begin());                    // erasing by iterator
 mymap.erase("France");                         // erasing by key
 mymap.erase(mymap.find("China"), mymap.end()); // erasing by range
 
-// 是否存在
+// 是否存在 contains
 std::unordered_map<std::string, std::string>::const_iterator got = mymap.find("France");
 mymap.find("France") != mymap.end();
 mymap.count("France") == 1;
@@ -390,6 +391,7 @@ std::vector<K> top_keys_by_value(const std::unordered_map<K, V> &map, uint32_t s
 std::vector<int> d {100, 200, 300};
 std::vector<int> v {1, 2, 3, 4, 5};
 std::copy(d.begin(), d.end(), std::inserter(v, std::next(v.begin())));
+std::copy(d.begin(), d.end(), std::back_inserter(v));
 // v: 1 100 200 300 2 3 4 5
 
 // 过滤
@@ -425,8 +427,21 @@ std::sort(vec.begin(), vec.end());
 vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
 
 // 元素是否存在
-std::find(vec.begint(), vec.end(), str) != vec.end()
+std::find(vec.begin(), vec.end(), str) != vec.end();
 
+// find_if
+auto it = std::find_if(std::begin(regions), std::end(regions), 
+    [region](const std::pair<RegionID, size_t> &x) -> bool {
+        if (x.first != region) {
+            return false;
+        }
+        return true;
+    }
+);
+int showRegion = 2;
+if (std::distance(std::begin(regions), it) < 3) {
+    showRegion = 1;
+}
 
 ```
 
@@ -471,6 +486,17 @@ std::string str = p;
 const char *pBuf = "hello world";
 const unsigned char *pTmp = (const unsigned char *)pBuf;
 
+
+#include <sstream>
+
+template <typename T>
+std::string tostring(const T& t) {
+    std::ostringstream ss;
+    ss << t;
+    return ss.str();
+}
+uint64_t data = 123;
+std::string mystring = tostring(data);
 ```
 
 #### 8、智能指针
@@ -600,7 +626,8 @@ std::transform(s.begin(), s.end(), s.begin(),
                [](unsigned char c) -> unsigned char { return std::toupper(c); });
 // s -> HELLO
 std::vector<std::size_t> ordinals;
-std::transform(s.begin(), s.end(), std::back_inserter(ordinals),                [](unsigned char c) -> std::size_t { return c; });
+std::transform(s.begin(), s.end(), std::back_inserter(ordinals), 
+    [](unsigned char c) -> std::size_t { return c; });
 std::transform(s.begin(), s.end(), std::inserter(ordinals, ordinals.begin()),
                [](unsigned char c) -> std::size_t { return c; });
 // s -> {72 69 76 76 79}
@@ -663,6 +690,11 @@ Student &refb = const_cast<Student&>(refa);
 refb.v = 200;
 // refa、refb引用同一个对象
 std::cout << refa.v << "\n" << refb.v << std::endl;
+
+// dynamic_cast
+// class RRContext : public BaseContext {
+BaseContext* ctx;
+RRContext* rctx = dynamic_cast<RRContext*>(ctx);
 ```
 
 #### 15、基本类型的最大最小值
@@ -698,6 +730,7 @@ for (int i = 0; i < count; i++) {
   v.push_back(temp);  
 }
 // 2 push_back(string &&), 参数是右值引用
+// std::move把左值引用强制转换为右值引用
 for (int i = 0; i < count; i++) {
   std::string temp("ceshi");
   v.push_back(std::move(temp));
@@ -707,13 +740,19 @@ for (int i = 0; i < count; i++) {
   v.push_back("ceshi");
 }
 // 4 只有一次构造函数，不调用拷贝构造函数，速度最快
+// emplace_back把参数"ceshi"完美转发给string的构造函数，直接构造了一个元素，而这个元素是直接存放在vector容器中的
 for (int i = 0; i < count; i++) {
   v.emplace_back("ceshi");
 }
-// 1 耗时最长，将调用左值引用的push_back，且将会调用一次string的拷贝构造函数
-// 2 3 4 调用string的移动构造函数，移动构造函数耗时比拷贝构造函数少，因为不需要重新分配内存空间
-// 5 emplace_back只调用构造函数，没有移动构造函数，也没有拷贝构造函数
+// 1 耗时最长，将调用左值引用的push_back，且将会调用一次string的【拷贝构造函数】
+// 2 3 调用string的【移动构造函数】，移动构造函数耗时比拷贝构造函数少，因为不需要重新分配内存空间
+// 4 emplace_back只调用构造函数，没有移动构造函数，也没有拷贝构造函数
 
+// 传入的参数temp不是右值引用，需要先调用temp的复制构造函数生成一个副本，然后把副本的右值引用传递给emplace_back，最终造成v.emplace_back(temp)等效与v.push_back(temp)。
+for (int i = 0; i < count; i++) {
+    std::string temp("ceshi");
+    v.emplace_back(temp);
+}
 
 // emplace 最大的作用是避免产生不必要的临时变量，因为它可以完成 in place 的构造
 struct Foo {
@@ -722,8 +761,8 @@ struct Foo {
 
 std::vector<Foo> v;
 v.emplace(it, 42, 3.1416);        // 没有临时变量产生
-v.insert(it, Foo(42, 3.1416));    // 需要产生一个临时变量
-v.insert(it, {42, 3.1416});       // 需要产生一个临时变量
+v.insert(it, Foo(42, 3.1416));    // 需要产生一个临时变量，临时值是右值引用
+v.insert(it, {42, 3.1416});       // 需要产生一个临时变量，临时值是右值引用
 ```
 
 #### 17、for_each
@@ -820,6 +859,21 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 std::string str1 = "Hello World";
 std::vector<std::string> words = split(str1, ' ');
+
+#include <boost/algorithm/string.hpp>
+std::vector<std::string> vec;
+boost::split(vec, str, boost::is_any_of(sep));
+
+template <typename T>
+std::vector<T> split(const std::string &str, const std::string &sep) {
+    std::vector<std::string> ids;
+    boost::split(ids, str, boost::is_any_of(sep));
+    std::vector<T> s;
+    for (auto id : ids) {
+        s.push_back(T(strtoul(id.c_str(), nullptr, 10)));
+    }
+    return s;
+}
 ```
 
 #### 20、vector元素最大值最小值
@@ -853,5 +907,47 @@ int minIndex(const std::vector<int> &vec, int* index) {
     auto smallest = std::min_element(vec.begin(), vec.end());
     *index = std::distance(std::begin(vec), smallest);
     return *smallest;
+}
+```
+
+#### 21、std::function
+``` cpp
+bool parseRequest(std::function<std::string(const std::string &)> g);
+bool parseBRPCRequest(BRPCContext *brpc_context) {
+    auto &q = brpc_context->req->queries();
+    auto getter = [&q](const std::string &key) -> std::string {
+        auto it = q.find(key);
+        if (it == std::end(q)) {
+            return "";
+        }
+        return it->second;
+    };
+    return parseRequest(getter);
+}
+
+std::string build = std::strtoul(platBuild.c_str(), nullptr, 10);
+std::function<bool(uint64_t)> comfun = static_cast<std::function<bool(uint64_t)>>(std::bind(std::greater<uint64_t>(), std::placeholders::_1, build));
+std::function<bool(uint64_t)> comfun = static_cast<std::function<bool(uint64_t)>>(std::bind(std::less<uint64_t>(), std::placeholders::_1, build));
+
+void filterCandidates(const std::vector<ItemID>& items,
+                    std::vector<std::function<bool(ItemID)>> filterFuncs) {
+    size_t cnt = 0;
+    for (const auto& id : items) {
+        if (alreadyInCandidates(ctx, id, type)) {
+            continue;
+        }
+        bool filtered = false;
+        for (auto& f : filterFuncs) {
+            if (f(id)) {
+                filtered = true;
+                break;
+            }
+        }
+        if (filtered) {
+            recordFoupTypeMap(ctx, id, type);
+            continue;
+        }
+        insertIntoCandidateMap(ctx, id, type);
+    }
 }
 ```
