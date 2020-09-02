@@ -870,4 +870,17 @@ select * from q1;
 select "$path" from dws_table;
 ```
 
+#### 48、presto 时间转换
+``` sql
+select format_datetime(from_unixtime(cast(substr('1598865255', 1, 10) as int)), 'yyyy-MM-dd HH:mm:ss');
+
+date_parse('20200825', '%Y%m%d');  -- 2020-08-25 00:00:00.000
+date_parse('20200825', '%Y%m%d') + interval '1' day; -- 2020-08-26 00:00:00.000
+date_parse('20200825', '%Y%m%d') + interval '-1' day; -- 2020-08-24 00:00:00.000
+date_format(date_parse('20200825', '%Y%m%d') + interval '1' day, '%Y%m%d'); -- 20200826
+
+
+
+```
+
 
