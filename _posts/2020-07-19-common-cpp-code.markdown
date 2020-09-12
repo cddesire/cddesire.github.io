@@ -955,7 +955,7 @@ void filterCandidates(const std::vector<ItemID>& items,
 #### 22、集合join
 ``` cpp
 const std::string delimiter = "$", sep = ":";
-std::unordered_map<std::string, int> map{{"11", 1}, {"22", 2}};
+std::unordered_map<std::string, int> map{};
 std::string ret = std::accumulate(map.begin(), map.end(), std::string(), [delimiter, sep](const std::string& s, const std::pair<const std::string, int>& p) {
     return s + (s.empty() ? std::string() : delimiter) + p.first + sep + std::to_string(p.second);
 });
