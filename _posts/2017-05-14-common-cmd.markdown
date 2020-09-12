@@ -741,6 +741,8 @@ awk 'NR%3{printf $0",";next;}1' data
 #### brew
 ``` sh
 # brew 安装
+/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
+
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile
 brew doctor
@@ -1393,7 +1395,23 @@ docker rmi -f ${docker images -qa}
 
 根据Dockerfile构建镜像
 从当前路径的Dockerfile构建 镜像名称为dongdong，版本为v1.0
-docker build --no-cache -t dongdong:v1.0 .
+docker build --no-cache . -f Dockerfile -t dong_fedora:1.0.0\
+
+Dockerfile
+FROM fedora:29
+RUN dnf install -y \
+    which make libtool cmake clang gcc-gfortran \
+    redhat-rpm-config gperftools-devel libatomic \
+    dumb-init lldb gdb python2-pip python2-devel \
+    git libasan mariadb-connector-c-devel supervisor \
+    htop grep procps-ng iproute vim hostname \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "alias ll='ls -l'" >> /root/.bashrc
+ENV LANG=C.UTF-8 CC=gcc CXX=g++ GIT_SSH_COMMAND='/usr/bin/ssh -o StrictHostKeyChecking=no -i /keys/id_rsa' PEGASUS_ENV=TEST
+# ADD your_key /keys/id_rsa
+# RUN export GIT_SSH_COMMAND='/usr/bin/ssh -o StrictHostKeyChecking=no -i /keys/id_rsa'
+ENV DATA_GROUP_ID=1
+CMD ["/usr/bin/python2", "/usr/bin/supervisord", "-c", "/etc/supervisord.conf", "-n"]
 
 ```
 ##### docker 容器
@@ -1419,6 +1437,10 @@ docker rm dongdong
 docker exec -it --env COLUMNS=`tput cols` --env LINES=`tput lines` dongdong /bin/bash 
 
 ```
+
+docker run -dit --name dongdong-dev -v /Users/danielchang/Documents/project_code:/workspace dong_fedora:1.0.0 
+docker build . -f Dockerfile -t dong_fedora:1.0.0
+docker exec -it dongdong-dev /bin/bash
 
 #### hdfs文件查看
 ``` sh
