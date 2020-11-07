@@ -184,10 +184,30 @@ printf "%d\n" 0xfff
 h2d(){echo "ibase=16; $@"|bc}
 ```
 
+#### 读取文件操作
+``` sh
+while read line
+do
+    echo $line
+done < test.txt
+
+cat test.txt | while read line
+do
+    echo $line
+done
+
+for line in $(cat  test.txt)
+do
+    echo $line
+done
+
+```
+
 ####  操作文件名中有空白字符文件
 ``` sh
 find . -name "*.txt" -type f -print0 | while read -d $'\0' file; do cat "$file" >> merge.txt; done
-     find . -print0 | while read -d $'\0' file; do cp -v "$file" /tmp; done
+
+find . -print0 | while read -d $'\0' file; do cp -v "$file" /tmp; done
 ```
 
 ####  找出所有文件内容包含MapReduce的文件
@@ -1438,10 +1458,6 @@ docker exec -it --env COLUMNS=`tput cols` --env LINES=`tput lines` dongdong /bin
 
 ```
 
-docker run -dit --name dongdong-dev -v /Users/danielchang/Documents/project_code:/workspace dong_fedora:1.0.0 
-docker build . -f Dockerfile -t dong_fedora:1.0.0
-docker exec -it dongdong-dev /bin/bash
-
 #### hdfs文件查看
 ``` sh
 hadoop fs -cat /Data/Logs/2018-08-22/2018-08-22_log.lzo | lzop -dc
@@ -1451,3 +1467,4 @@ hadoop fs -cat /shining/temp.txt.gz | zcat
 
 hadoop fs -cat /temp/b.bz2 | bzip2 -d
 ```
+

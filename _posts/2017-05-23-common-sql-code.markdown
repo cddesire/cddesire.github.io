@@ -879,6 +879,7 @@ date_parse('20200825', '%Y%m%d') + interval '1' day; -- 2020-08-26 00:00:00.000
 date_parse('20200825', '%Y%m%d') + interval '-1' day; -- 2020-08-24 00:00:00.000
 date_format(date_parse('20200825', '%Y%m%d') + interval '1' day, '%Y%m%d'); -- 20200826
 
+hour(from_unixtime(cast('1602539327' as int))) -- 05
 
 
 ```

@@ -969,4 +969,24 @@ std::string ret = std::accumulate(v.begin()+1, v.end(), std::to_string(v[0]),
 
 ```
 
+#### 23、多个vector合并
+``` cpp
+data.insert(data.end(), left.begin(), left.end());
+data.push_back(mid);
+data.insert(data.end(), right.begin(), right.end());
+
+#include <algorithm>
+#include <iterator>
+std::copy(left.begin(), left.end(), std::back_inserter(data));
+data.push_back(mid);
+std::copy(right.begin(), right.end(), std::back_inserter(data));
+
+data.insert(data.end(), std::make_move_iterator(left.begin()), std::make_move_iterator(left.end()));
+data.push_back(mid);
+data.insert(data.end(), std::make_move_iterator(right.begin()), std::make_move_iterator(right.end()));
+
+```
+
+
+
 
