@@ -1364,6 +1364,7 @@ git remote prune origin
 
 ##### 拉取更新子模块
 ``` sh
+git submodule add https://git.oschina.net/gaofeifps/leg.git
 git submodule update --init --recursive
 ```
 
