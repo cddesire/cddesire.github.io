@@ -1237,7 +1237,6 @@ var name_list = $x("//div[@class='expert-item-content team-v2 shadow-10 bg-color
 name_list.map(function(value, index){console.log("index:" + index + ", value: " + value.nodeValue)})
 
 # 爬取小说标签
-
 import requests 
 from lxml import html 
 url = "https://www.biqi.org/tag/{}.html"
@@ -1245,19 +1244,40 @@ url = "https://www.biqi.org/tag/{}.html"
 tags = []
 for i in range(1, 23):
     page_url = url.format(i)
-    content = requests.get(page_url).content 
-    sel = html.fromstring(content) 
-    tag_list = sel.xpath("//table[@class='tagCol']/tbody/tr/td/a//text()")
-    print(page_url, tag_list)
+    response = requests.get(page_url, headers={})
+    content = response.content.decode("utf8")
+    selector = html.fromstring(content) 
+    tag_list = selector.xpath("//table[@class='tagCol']/tbody/tr/td/a/text()")
+    url_list = selector.xpath("//table[@class='tagCol']/tbody/tr/td/a/@href")
+    num_list = selector.xpath("//table[@class='tagCol']/tbody/tr/td/b/text()")
+    print(page_url, tag_list, num_list)
     tags.extend(tag_list)
 
 print(tags)
 
-# BeautifulSoup爬取
 
+import requests 
+from lxml import html 
+url = "https://www.xiagu.org/tag/id/24.html"
+response = requests.get(url, headers={})
+content = response.content.decode("utf8")
+selector = html.fromstring(content) 
+sub_divs = selector.xpath("//li[@class='subject-item']/div/div[@class='pub']")
+for div in sub_divs:
+    # html.tostring(div, encoding='utf8').decode('utf8')
+    keys = div.xpath("./text()")
+    author = div.xpath('./a[1]/text()')[0]
+    category = div.xpath('./a[2]/text()')[0]
+    # values = div.xpath("./a/text()")
+    urls = div.xpath("./a/@href")
+    print(keys[0], author, keys[1], category, keys[2])
+    # best answer
+    # target = div.xpath("string(.)")
+
+
+# BeautifulSoup爬取
 import requests
 from bs4 import BeautifulSoup
-
 from lxml import html 
 url = "https://www.biqi.org/tag/{}.html"
 
@@ -1270,7 +1290,6 @@ for i in range(1, 23):
     for item in items:
         for t in item.find_all('a'):
             # <a href="/tag/id/829.html">女扮男装</a>
-
             sub_url = t.attrs['href']
             name = t.string
             tags.append((sub_url, name))
@@ -1782,6 +1801,45 @@ user.age = 20
 print(user.age)
 print(user._age)
 
+```
+
+#### 85、asyncio
+``` python
+import asyncio
+import aiohttp
+import time
+
+async def download_one(session, semaphore, url):
+    async with semaphore:
+        async with session.get(url) as resp:
+            html = await resp.text()
+            print('Read {} length {} from {}'.format(html, resp.content_length, url))
+
+async def download_all(sites):
+    async with aiohttp.ClientSession() as session:
+        # 限制并发量
+        semaphore = asyncio.Semaphore(2)
+        #tasks = [asyncio.ensure_future(download_one(session, site)) for site in sites]
+        tasks = [asyncio.create_task(download_one(session, semaphore, site)) for site in sites]
+        await asyncio.gather(*tasks)
+
+def main():
+    sites = [
+        'http://c.biancheng.net',
+        'http://c.biancheng.net/c',
+        'http://c.biancheng.net/python'
+    ]
+    start_time = time.perf_counter()
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(download_all(sites))
+    finally:
+        loop.close()
+    end_time = time.perf_counter()
+    print('Download {} sites in {} seconds'.format(len(sites), end_time - start_time))
+
+if __name__ == '__main__':
+    main()
 ```
 
 
