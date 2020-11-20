@@ -1677,6 +1677,15 @@ ValueError: substring not found
 
 'xy' in 'abxycd'
 True
+
+# count
+
+a.count("ovo") > 0
+
+a.__contains__("ovo")
+
+import operator
+operator.contains(a, "ovo")
 ```
 
 #### 79、多个特殊字符替换

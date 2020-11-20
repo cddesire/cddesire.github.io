@@ -243,6 +243,7 @@ mymap.erase(it_low, it_up);        // erases [it_low, it_up)
 #### 6、unordered_map 
 ``` cpp
 #include <string>
+
 #include <unordered_map>
 
 // 初始化
@@ -272,6 +273,10 @@ std::unordered_map<std::string, int> mymap;
 mymap["Mars1"] = 3396;
 mymap.at("Saturn") += 272;
 mymap.at("Jupiter") = mymap.at("Saturn") + 9638;
+
+// 值的读取和find配合使用
+auto it = mymap.find(id);
+int value = it == mymap.end() ? 0 : it->second;
 
 // 插入
 std::unordered_map <std::string, double> myrecipe, mypantry;
@@ -639,9 +644,13 @@ std::transform(ordinals.cbegin(), ordinals.cend(), ordinals.cbegin(),
 #### 13、random
 ``` cpp
 #include <random>
+
 #include <algorithm>
+
 #include <iterator>
+
 #include <iostream>
+
 std::vector<int> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 std::random_device rd;
 std::mt19937 g(rd());
@@ -788,6 +797,7 @@ std::cout << std::get<2>(composition) << std::endl;
 
 
 #include <iostream>
+
 #include <tuple>
 /*
  * Default first type of the tuple is int; opt. specify other type
@@ -861,8 +871,12 @@ std::string str1 = "Hello World";
 std::vector<std::string> words = split(str1, ' ');
 
 #include <boost/algorithm/string.hpp>
+
 std::vector<std::string> vec;
-boost::split(vec, str, boost::is_any_of(sep));
+boost::trim(str);
+boost::split(vec, str, boost::is_any_of(sep), boost::token_compress_on);
+std::string res = boost::join(vec, "-");
+
 
 template <typename T>
 std::vector<T> split(const std::string &str, const std::string &sep) {
@@ -913,7 +927,7 @@ int minIndex(const std::vector<int> &vec, int* index) {
 #### 21、std::function
 ``` cpp
 bool parseRequest(std::function<std::string(const std::string &)> g);
-bool parseBRPCRequest(BRPCContext *brpc_context) {
+bool parseRPCRequest(BRPCContext *brpc_context) {
     auto &q = brpc_context->req->queries();
     auto getter = [&q](const std::string &key) -> std::string {
         auto it = q.find(key);
@@ -923,32 +937,6 @@ bool parseBRPCRequest(BRPCContext *brpc_context) {
         return it->second;
     };
     return parseRequest(getter);
-}
-
-std::string build = std::strtoul(platBuild.c_str(), nullptr, 10);
-std::function<bool(uint64_t)> comfun = static_cast<std::function<bool(uint64_t)>>(std::bind(std::greater<uint64_t>(), std::placeholders::_1, build));
-std::function<bool(uint64_t)> comfun = static_cast<std::function<bool(uint64_t)>>(std::bind(std::less<uint64_t>(), std::placeholders::_1, build));
-
-void filterCandidates(const std::vector<ItemID>& items,
-                    std::vector<std::function<bool(ItemID)>> filterFuncs) {
-    size_t cnt = 0;
-    for (const auto& id : items) {
-        if (alreadyInCandidates(ctx, id, type)) {
-            continue;
-        }
-        bool filtered = false;
-        for (auto& f : filterFuncs) {
-            if (f(id)) {
-                filtered = true;
-                break;
-            }
-        }
-        if (filtered) {
-            recordFoupTypeMap(ctx, id, type);
-            continue;
-        }
-        insertIntoCandidateMap(ctx, id, type);
-    }
 }
 ```
 
