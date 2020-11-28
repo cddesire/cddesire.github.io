@@ -773,7 +773,57 @@ from
       select y, score from some.table
     )t1
   )t2
-)t3
+)t3;
+
+-- gauc
+
+with 
+user_inst_info as (
+    select
+        mark
+        , label
+        , row_number() over(partition by mark order by score asc) as r
+    from 
+    (
+        select
+            'uuid:'|| uuid || '_gauc' || '@'|| split(info, '_')[1] as mark 
+            , cast(score as decimal(20, 6)) as score
+            , label
+        from model_predict
+        where uuid in ('1121004652213939')
+    )t
+), 
+user_stat_info as (
+    select
+        mark
+        , sum_neg
+        , sum_pos
+        , num_ins
+        , 1.000000 * (sum_pos_rank - 0.5 * sum_pos * (sum_pos + 1)) / (sum_neg * sum_pos) as auc
+    from 
+    (
+        select
+            mark
+            , sum(if(label<>1, 1, 0)) as sum_neg
+            , sum(if(label=1, 1, 0)) as sum_pos
+            , count(1) as num_ins
+            , sum(if(label=1, r, 0)) as sum_pos_rank
+        from user_inst_info
+        group by mark
+        having sum(if(label=1, 1, 0))>0 and sum(if(label<>1, 1, 0))>0
+    )t
+)
+select
+    split(mark, '@')[1] as mark 
+    , count(1) as mids 
+    , sum(num_ins) as num_ins 
+    , sum(sum_pos) as sum_pos 
+    , 1.00000 * sum(sum_pos) / sum(num_ins) as pos_rate 
+    , 1.00000 * sum(auc * num_ins) / sum(num_ins) as gauc 
+from user_inst_info
+group by 1
+order by 1
+;
 ```
 
 #### 45、计算连续登陆天数

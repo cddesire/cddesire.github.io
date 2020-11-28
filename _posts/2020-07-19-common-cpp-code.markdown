@@ -276,7 +276,7 @@ mymap.at("Jupiter") = mymap.at("Saturn") + 9638;
 
 // 值的读取和find配合使用
 auto it = mymap.find(id);
-int value = it == mymap.end() ? 0 : it->second;
+int value = it == mymap.cend() ? 0 : it->second;
 
 // 插入
 std::unordered_map <std::string, double> myrecipe, mypantry;
@@ -294,6 +294,10 @@ mymap.erase(mymap.find("China"), mymap.end()); // erasing by range
 std::unordered_map<std::string, std::string>::const_iterator got = mymap.find("France");
 mymap.find("France") != mymap.end();
 mymap.count("France") == 1;
+
+// 直接操作value
+std::unordered_map<uint64_t, uint64_t> mymap;
+++unclickRegionMap[0];
 
 ```
 
@@ -887,6 +891,13 @@ std::vector<T> split(const std::string &str, const std::string &sep) {
         s.push_back(T(strtoul(id.c_str(), nullptr, 10)));
     }
     return s;
+}
+
+std::string foo = "abcdef";
+if (foo.find("cde") != std::string::npos) {
+   std::cout << "find";
+} else {
+   std::cout << "not find";
 }
 ```
 
