@@ -444,32 +444,6 @@ from os import listdir
 from os.path import isfile, join
 files = [f for f in listdir(stop_word_dir) if isfile(join(stop_word_dir, f))]
 
-with open(file_name, "w", encoding="utf-8") as f_zvalue:
-    for m in range(self.M):
-        pass
-        
-f = open('test.txt')
-lines = f.readlines()
-f.close()
-
-f = open('test.txt')
-for line in f:
-    print line
-f.close()
-
-import os
-os.remove('test.txt')
-
-f = open('myfile.txt', 'w')
-f.write('another hello world!')
-f.close()
-
-for line in f.readlines():
-    if not line.strip():
-        continue
-    #处理每行\n
-
-    line = line.strip('\n').line.split(',')
 
 # 以某字符串结尾的文件
 
@@ -481,9 +455,82 @@ for dirpath, dirnames, files in os.walk(topdir):
         if name.lower().endswith(ext):
             print(os.path.join(dirpath, name))
 
+# 获取所有py文件
+
+from pathlib import Path
+py_files = list(Path('.').glob("*.py"))
+from glob import glob
+py_files = list(glob('*.py'))
+
+
+with open(file_name, "w", encoding="utf-8") as f_zvalue:
+    for m in range(self.M):
+        pass
+        
+f = open('test.txt')
+for line in f.readlines():
+    if not line.strip():
+        continue
+    line = line.strip('\n').line.split(',')
+f.close()
+
+
+f = open('myfile.txt', 'w')
+f.write('another hello world!')
+f.close()
+
+
+# 删除文件 / 文件夹
+
+import os
+os.path.isfile('test.txt')
+os.remove('test.txt')
+os.path.exists('test.txt')
+
+os.path.isdir('test_folder')
+os.rmdir('test_folder')
+os.path.exists('test_folder')
+
 # 绝对路径
 
 os.path.abspath(".")
+
+# 获取当前目录
+
+import os
+cur_dir = os.getcwd()
+from pathlib import Path
+cur_dir = Path.cwd()
+
+# 创建目录
+
+os.mkdir("test_folder")
+Path("test_folder").mkdir(parents=True, exist_ok=True)
+
+# 移动文件
+
+target_folder = Path("py_bak")
+target_folder.mkdir(parents=True, exist_ok=True)
+source_folder = Path('.')
+py_files = source_folder.glob('*.py')
+for py in py_files:
+    filename = py.name
+    target_path = target_folder.joinpath(filename)
+    print(f"** 移动文件 {filename}")
+    print("目标文件存在:", target_path.exists())
+    py.rename(target_path)
+    print("目标文件存在:", target_path.exists(), '\n')
+
+# 复制文件
+
+import shutil
+source_file = "target_folder/hello.txt"
+target_file = "hello2.txt"
+target_file_path = Path(target_file)
+print("* 复制前，文件存在:", target_file_path.exists())
+shutil.copy(source_file, target_file)
+print("* 复制后，文件存在:", target_file_path.exists())    
+
 ```
 
 

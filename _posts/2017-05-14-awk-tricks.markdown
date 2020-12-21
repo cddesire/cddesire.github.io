@@ -164,24 +164,25 @@ awk 'gsub("----",",")'
 ```
 
 -	**找出匹配的子串**
-```	shell
+``` shell
 echo "abcdef" | awk '{match($0,/b(.*)e/); print substr($0,RSTART)}'  #bcdef
+```
+``` shell
 echo "abcdef" | awk '{match($0,/b(.*)e/,a); print a[0]}'  #bcde
+```
+``` shell
 echo "abcdef" | awk '{match($0,/b(.*)e/,a); print a[1]}'  #cd
+```
+``` shell
 echo "abcdef" | gawk 'match($0, /b(.*)e/, a) {print a[1]}'  #cd
-echo "xxx=a&yyy=b&zzz=c" | awk '{match($0,"yyy=([^&]+)",a)}END{print a[1]}'
-
-echo "this is chen,and wang,not wan" | awk '{match($0, /.+is([^,]+).+not(.+)/, a); print a[1], a[2]}' # chen  wan
+```
+``` shell
+echo "xxx=a&yyy=b&zzz=c" | awk '{match($0,"yyy=([^&]+)",a);print a[1]}'
 ```
 
 -	**写入多个文件**
 ```	shell
 awk '{print >> ("filename"$1)}'
-```
-
--	**计算调用方法耗时**
-``` shell
-tail -100000 performance.log | awk -F '-' '{print substr($2, 2, length($2) - 3)}' | awk '/^com/ {print $0}' | awk -F '=' '{a[$1]+=$2; b[$1]++;}END{for(i in a){print i, b[i], a[i] / b[i];}}' | sort -n -k 3 -r
 ```
 
 - **过滤**

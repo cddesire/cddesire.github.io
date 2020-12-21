@@ -1362,6 +1362,13 @@ git remote prune origin
 
 ```
 
+#### git config
+``` sh
+格式化日志
+git config --global alias.lg "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+
+```
+
 ##### 拉取更新子模块
 ``` sh
 git submodule add https://git.oschina.net/gaofeifps/leg.git
@@ -1468,4 +1475,13 @@ hadoop fs -cat /shining/temp.txt.gz | zcat
 
 hadoop fs -cat /temp/b.bz2 | bzip2 -d
 ```
+
+#### arthas
+``` sh
+curl -O https://arthas.aliyun.com/arthas-boot.jar
+/usr/local/jdk1.8.0/bin/java -jar arthas-boot.jar
+java -jar arthas-boot.jar
+```
+
+
 
