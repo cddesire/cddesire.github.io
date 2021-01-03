@@ -24,6 +24,7 @@ ARRAY_SIZE(percents)
 ``` cpp
 // std::lower_bound 在first和last中的前闭后开区间进行二分查找，返回大于或等于val的第一个元素的iterator位置。如果所有元素都小于val，则返回last的iterator位置。
 #include <algorithm>
+
 float percentLineNorm(uint32_t *percents, size_t size, uint32_t value) {
     auto it = std::lower_bound(percents, percents + size, value);
     auto diff = std::distance(percents, it);
@@ -45,6 +46,7 @@ std::cout << pct << std::endl;
 #### 3、日期和时间库
 ``` cpp
 #include <chrono>
+
 // 时间间隔Duration
 std::chrono::milliseconds ms{3}; 
 std::chrono::microseconds us = 2 * ms; 
@@ -88,8 +90,11 @@ std::chrono::system_clock::time_point time1(std::chrono::seconds(1578466970));
 
 // 时间的格式化输出
 #include <chrono>
+
 #include <ctime>
+
 #include <iomanip>
+
 std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 std::cout << std::put_time(std::localtime(&t), "%Y-%m-%d %X") << std::endl;
 std::cout << std::put_time(std::localtime(&t), "%Y-%m-%d %H.%M.%S") << std::endl;
@@ -580,7 +585,9 @@ auto add = [&c](int a, int b) -> int {
 #### 10、future
 ``` cpp
 #include <iostream>
+
 #include <future>
+
 #include <thread>
 
 auto get_value = []() { return 10; };
@@ -713,7 +720,9 @@ RRContext* rctx = dynamic_cast<RRContext*>(ctx);
 #### 15、基本类型的最大最小值
 ``` cpp
 #include <limits>
+
 #include <iostream>
+
 std::cout << "short: " << std::dec << std::numeric_limits<short>::max()
           << " or " << std::hex << std::showbase << std::numeric_limits<short>::max() << '\n'
           << "int: " << std::dec << std::numeric_limits<int>::max()
@@ -975,7 +984,9 @@ data.push_back(mid);
 data.insert(data.end(), right.begin(), right.end());
 
 #include <algorithm>
+
 #include <iterator>
+
 std::copy(left.begin(), left.end(), std::back_inserter(data));
 data.push_back(mid);
 std::copy(right.begin(), right.end(), std::back_inserter(data));

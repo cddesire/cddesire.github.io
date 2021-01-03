@@ -53,6 +53,23 @@ tags:
 ### Sublime 常用插件
 -	BracketHighlighter
 -	Alignment
+-	PackageResourceViewer 设置主题参数
+
+### Sublime 配置
+``` sh
+{
+  "color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
+  "font_face": "Source Code Pro",
+  "font_size": 15,
+  "ignored_packages":
+  [
+    "Vintage"
+  ],
+  "line_padding_bottom": 2,
+  "line_padding_top": 2,
+  "theme": "Default.sublime-theme"
+}
+```
 
 
 ### JetBrains激活
