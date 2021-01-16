@@ -1483,7 +1483,7 @@ curl -O https://arthas.aliyun.com/arthas-boot.jar
 java -jar arthas-boot.jar
 ```
 
-#### 有用脚本
+#### 参数脚本
 ``` sh
 #!/bin/bash 
 set -Eeuo pipefail
@@ -1571,5 +1571,36 @@ msg "- param: ${param}"
 msg "- arguments: ${args[*]-}"
 ```
 
+#### 删除文件保留最近3个
+``` sh
+#!/bin/bash
+set -e -o pipefail
+basedir=$(cd $(dirname $(readlink -f ${BASH_SOURCE:-$0}));pwd)
+
+dir=${1:?"undefined 'dir'"};shift
+test -d ${dir}
+dir=$(cd ${dir};pwd)
+test ${dir} != "/"
+test ${dir} != "${HOME}"
+
+cd ${basedir}
+
+echo "clean ${dir} ..."
+filenum=$(ls -rt ${dir}|wc -l)
+echo "${dir} has ${filenum} file(s)"
+if [[ ${filenum} -le 3 ]];then
+  exit 0
+fi
+
+for f in $(ls -rt ${dir}|head -n -3);do
+    if [[ ! -f ${dir}/${f} ]];then
+      echo "${dir}/${f} is not a file" >&2
+      continue
+    fi
+    echo "rm ${dir:?"undefined 'dir'"}/${f:?"undefined 'f'"}"
+    rm ${dir:?"undefined 'dir'"}/${f:?"undefined 'f'"}
+done
+
+```
 
 
