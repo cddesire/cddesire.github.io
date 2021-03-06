@@ -25,14 +25,12 @@ env
 crontab -l
 ```
 
-####   查看挂接的分区状态
-``` sh
-mount | column -t
-```
-
 ####   查看所有分区
 ``` sh
 fdisk   -l
+
+#查看挂载的设备，以及这些设备的文件系统
+lsblk -f
 ```
 
 ####   查看各分区使用情况
@@ -42,40 +40,57 @@ fdisk   -l
 # 显示已用可用的磁盘空间
 df -hT
 # 显示当前目录磁盘使用统计
-du -sh *
+du -hs * | sort -h
 # 显示当前目录最大的10个文件或者文件夹
 du -s * | sort -nr | head
 
 ```
 
-####   查看所有交换分区
+####   sar（System Activity Reporter）
 ``` sh
-swapon -s
+sar [ options ] [ <interval> [ <count> ] ]
+
+# 整体CPU使用统计(-u)
+sar -u 3 2
+# 1. 若 %iowait 的值过高，表示硬盘存在I/O瓶颈；
+# 2. 若 %idle 的值高但系统响应慢时，有可能是 CPU 等待分配内存，此时应加大内存容量；
+# 3. 若 %idle 的值持续低于1，则系统的 CPU 处理能力相对较低，表明系统中最需要解决的资源是 CPU；
+
+# 整体I/O情况(-b)
+sar -b 3 2
+# bread/s：每秒钟从物理设备读入的数据量，单位为 块/s  bwrtn/s：每秒钟向物理设备写入的数据量，单位为 块/s
+
+# 各个I/O设备情况(-d)
+sar -d -p 3 2
+
+# rd_sec/s: 每秒从设备读取的扇区数；wr_sec/s: 每秒往设备写入的扇区数
+# avgrq-sz: 发送给设备的请求的平均大小（以扇区为单位）；avgqu-sz: 发送给设备的请求队列的平均长度
+# await ：服务等待I/O请求的平均时间，包括请求队列等待时间 (单位毫秒)； svctm ：设备处理I/O请求的平均时间，不包括请求队列等待时间 (单位毫秒)
+# %util ：一秒中有百分之多少的时间用于 I/O 操作，即被io消耗的cpu百分比；
+
+# 如果 %util 接近 100%，说明产生的I/O请求太多，I/O系统已经满负荷，该磁盘可能存在瓶颈。
+# 如果 svctm 比较接近 await，说明 I/O 几乎没有等待时间；如果 await 远大于 svctm，说明I/O 队列太长，io响应太慢，则需要进行必要优化。
+# 如果avgqu-sz比较大，也表示有当量io在等待。
+
+# 网络统计(-n)
+sar -n DEV 3 2
+
+# rxpck/s 和 txpck/s 分别表示每秒接收，发送的网络帧数，也就是PPS
+# rxKB/s 和 txKB/s 分别表示每秒接收，发送的 千 字节数，也就是BPS
+# rxcmp/s 每秒接收的压缩数据包，txcmp/s 每秒发送的压缩数据包
 ```
 
-####   查看内存使用量和交换区使用量
+####   查看内存
 ``` sh
-free -m
-```
-
-####   查看内存总量
-``` sh
+# 查看内存总量
 grep    MemTotal     /proc/meminfo
-```
-
-####  查看空闲内存量
-``` sh
+#查看空闲内存量
 grep   MemFree  /proc/meminfo
 ```
 
 ####  查看磁盘参数
 ``` sh
 hdparm   -i    /dev/hda
-```
-
-####  查看系统负载
-``` sh
-cat /proc/loadavg
 ```
 
 ####  本机IP地址
@@ -131,27 +146,55 @@ echo ${now},${tcp_re_rate}
 ####  统计代码行数
 ``` sh
 # （ -name  中间有空格
-find . -type f  \( -name "*.java" -o -name "*.scala" \) | xargs cat|grep -v -e ^$ -e ^\s*\/\/.*$|wc -l
+find . -type f  \( -name "*.java" -o -name "*.scala" \) | xargs cat | grep -v -e ^$ -e ^\s*\/\/.*$ |wc -l
 ```
 
-####  同类型文件拷贝
+####  find命令处理
 ``` sh
+# 文件拷贝
 find some-dir -type f -name "*.txt" -exec cp \{\} new-dir \;
 find some-dir -type f -name "*.txt" -print0 | xargs -0 cp --target-directory=new-dir
 find some-dir -type f -name "*.txt" -print0 | xargs -I{} -0 cp -v {} /tmp/log-files
 # 其中{}为参数列表标记，-0表示当文件名为空白行，那么当前的执行命令不起作用，-I表示用来替换初始参数。
+
+#  批量制作目录的备份
+find -type -f -exec cp {} {}.bak \;
+
 # 删除7天前的日志
 find some-dir -type f -mtime +7 -name  "*.log" | xargs rm -f
-+N表示N天以前
--N表示N天以内
-atime指access time，即文件被读取或者执行的时间
-ctime即change time文件状态改变时间，指文件的i结点被修改的时间，如通过chmod修改文件属性
-mtime即modify time，指文件内容被修改的时间
-```
+find some-dir -type f -mtime +7 -name  "*.log" -exec rm -f {} \;
+# +N表示N天以前 -N表示N天以内
+# atime指access time，即文件被读取或者执行的时间
+# ctime即change time文件状态改变时间，指文件的i结点被修改的时间，如通过chmod修改文件属性
+# mtime即modify time，指文件内容被修改的时间
+# 空文件
+find . -type f -size 0 -delete
+# 删除空目录
+find . -type d -empty -delete
+# 通过inode删除文件
+ls -li
+find . -inum 51654543675 -exec rm -i {} \;
 
-####  查看不间断增长的日志
-``` sh
-tail -f -n 5 my_server_log
+
+# 操作文件名中有空白字符文件 合并文件
+find . -name "*.txt" -type f -print0 | while read -d $'\0' file; do cat "$file" >> merge.txt; done
+find . -print0 | while read -d $'\0' file; do cp -v "$file" /tmp; done
+# 压缩多个大文件成多个zip文件
+find . -maxdepth 1 -type f -print0 | xargs -0 -n 3 bash -c 'zip $$.zip "$@"' done
+
+# 找出所有文件内容包含MapReduce的文件
+find . -name "*.java" -print0 | xargs -0 grep -l "MapReduce"
+# 当前目录下的所有文件查找
+grep -RnsI --color=auto "MapReduce"  *
+
+# 找出所有符号链接文件
+find ./ -type l -ls
+
+# 找出大于10MB的tar.gz
+find / -type f -name *.tar.gz -size +10M -exec ls -l {} \;
+
+# 递归的修改当前目录内所有文件和目录的权限为777
+find . -print -exec chmod 777 {} \;
 ```
 
 #### 分析占用内存过高的进程
@@ -203,37 +246,23 @@ done
 
 ```
 
-####  操作文件名中有空白字符文件
+####  maven 处理
 ``` sh
-find . -name "*.txt" -type f -print0 | while read -d $'\0' file; do cat "$file" >> merge.txt; done
-
-find . -print0 | while read -d $'\0' file; do cp -v "$file" /tmp; done
-```
-
-####  找出所有文件内容包含MapReduce的文件
-``` sh
-find . -name "*.java" -print0 | xargs -0 grep -l "MapReduce"
-# 当前目录下的所有文件查找
-grep -RnsI --color=auto "MapReduce"  *
-```
-
-####  列出所有的maven依赖
-``` sh
+# 列出所有的maven依赖
 mvn dependency:resolve
 mvn -o dependency:list | grep ":.*:.*:.*" | cut -d] -f2- | sed 's/:[a-z]*$//g' | sort -u
 # cut中的-f m-n 表示显示第m栏到第n栏
 # sed 's/要替换的字符串/新的字符串/g'
 # sort -u 删除重复行
-```
+# maven下载源码
+mvn dependency:sources -DincludeGroupIds=com.jcraft,org.testng -Dclassifier=sources
+# 排查jar冲突
+mvn dependency:tree -Dverbose -Dincludes=com.alibaba:druid
 
-####  找出所有符号链接文件
-``` sh
-find ./ -type l -ls
-```
-
-####  如何找出大于10MB的tar.gz
-``` sh
-find / -type f -name *.tar.gz -size +10M -exec ls -l {} \;
+# spring boot run
+mvn -pl web -am spring-boot:run
+# -pl,--projects Comma-delimited list of specified reactor projects to build instead of all projects.
+# -am,--also-make
 ```
 
 ####  显示PATH变量里的文件夹
@@ -241,21 +270,16 @@ find / -type f -name *.tar.gz -size +10M -exec ls -l {} \;
 echo src::${PATH} | awk 'BEGIN{pwd=ENVIRON["PWD"];RS=":";FS="\n"}!$1{$1=pwd}$1!~/^\//{$1=pwd"/"$1}{print $1}'
 ```
 
-####  批量制作目录的备份
+####  sed 处理
 ``` sh
-find -type -f -exec cp {} {}.bak \;
-```
-
-####  用sed方法删除数字、特殊字符等
-``` sh
+# 用sed方法删除数字、特殊字符等
 sed "s,\x1B\[[0-9;]*[a-zA-Z],,g"
-```
-
-####  删除结尾空白
-``` sh
+# 删除结尾空白
 sed -i 's/[ \t]\+$//g' file.txt
 # 移除最后一个字符
 sed 's/.$//'
+# 隔行插入空行  先删除已有空行，然后添加一行
+sed '/^$/d;G' data.txt
 ```
 
 ####  查看java进程
@@ -286,23 +310,6 @@ jmap ‐histo 6148
 diff -qr /dirA /dirB
 ```
 
-#### 递归的修改当前目录内所有文件和目录的权限为777
-``` sh
-find . -print -exec chmod 777 {} \;
-```
-
-#### 删除文件
-``` sh
-# 空文件
-find . -type f -size 0 -delete
-# 删除空目录
-find . -type d -empty -delete
-# 删除7天前的文件
-rm -rf `find -maxdepth 1 -mindepth 1 -mtime +7`
-# 删除1年前的文件
-find ./ -type f -mtime +365 -exec rm -f {} \;
-```
-
 #### 不重复的行
 ``` sh
 awk '!($0 in a) {a[$0];print}' file
@@ -313,16 +320,6 @@ awk '!($0 in a) {a[$0];print}' file
 a=`ls`
 echo "current path is $(pwd)"
 echo "1+1=$((1+1))"
-```
-
-#### maven下载源码
-``` sh
-mvn dependency:sources -DincludeGroupIds=com.jcraft,org.testng -Dclassifier=sources
-```
-
-#### 排查jar冲突
-``` sh
- mvn dependency:tree -Dverbose -Dincludes=com.alibaba:druid
 ```
 
 #### tail 文件内容时，对每行输出增加一个时间戳
@@ -592,10 +589,19 @@ nohup bash command.sh >> a.log 2>&1 &
 #### bash 拼接数组
 ``` sh
 # arr_len=${#my_array[@]}
-my_array=($(hadoop fs -ls /user/hour/ | grep 'XXX' | sort | tail -n 168))
+my_array=($(hadoop fs -ls  /user/hour/log_date=* | grep "weighted$" |awk '{print $NF}' | sort | tail -n 30))
 arr_str="${my_array[@]}"
 path=${arr_str// /,}
 echo ${path}
+
+day="20210202"
+input=""
+for ((i=0; i<30; i++)); do
+    day_i=$(date -d "${day} -${i} days" "+%Y%m%d")
+    hdfs_dir="/user/hour/xxx/${day_i}/yyy"
+    hadoop fs -test -e ${hdfs_dir} && input="${input} ${hdfs_dir}"
+done
+
 ```
 
 #### bash 字符串切割数组
@@ -898,27 +904,28 @@ basedir=$(cd $(readlink -f $(dirname ${BASH_SOURCE:-$0}));pwd)
 
 #### unix时间转换
 ``` sh
-echo 1510798061 | awk '{print strftime("%c",$0)}'
-Thu 16 Nov 2017 10:07:41 AM CST
-echo 1510798061 | awk '{print strftime("%D",$0)}'
-11/16/17
-echo 1510798061 | awk '{print strftime("%T",$0)}'
-10:07:41
-echo 1510798061 | awk '{print strftime("%Y-%m-%d %T", $0)}'
-2017-11-16 10:07:41
+date -d @1604895803 "+%Y%m%d %T"
+20201109 12:23:23
+
+date -d "20201109 12:23:23" +%s   
+1604895803
+
+# 第一列是unxtime
+awk '{
+    cmd = "date -d @" $1 " +\"%Y-%m-%d %H:%M:%S\""
+    if ( (cmd | getline dd) > 0 ) {
+        $1 = dd
+    }
+    close(cmd)
+    print
+}' "$1"
+
 ```
 
 #### 查看打开的端口
 ``` sh
 lsof -i -P | grep -i "listen" 查看打开的端口
 -i, --ignore-case
-```
-
-#### spring boot run
-``` sh
-mvn -pl web -am spring-boot:run
--pl,--projects Comma-delimited list of specified reactor projects to build instead of all projects.
--am,--also-make
 ```
 
 #### yarn节点状态
@@ -936,11 +943,6 @@ fi
 if [[ ! "${array[@]}" =~ "six" ]]; then
     echo "666666"
 fi
-```
-
-#### 压缩多个大文件成多个zip文件
-``` sh
-find . -maxdepth 1 -type f -print0 | xargs -0 -n 3 bash -c 'zip $$.zip "$@"' none
 ```
 
 #### 同步文件到服务器
@@ -998,7 +1000,7 @@ echo '{"hostname":"test","uid":"123"}' | python -c 'import json,sys;obj=json.loa
 
 echo '{"hostname":"test","uid":"123"}'  | grep -Po '"uid":".*?"' | grep -Po '\d+' 
 
-echo '{"hostname":"test","uid":"123"}'  | python -mjson.tool | grep hostname
+echo '{"hostname":"test","uid":"123"}'  | python -m json.tool | grep hostname
 # 提取value
 echo '{"hostname":"test","uid":"123"}' | awk '{match($0, /hostname\":\"(\w+)\"/, a); print a[1]}'
 
@@ -1011,9 +1013,8 @@ pbpaste | jq '.[]|.id' | tr -d '"' | tr '\n' ','
 
 #### 目录下的文件转换为array
 ``` sh
-dirarr=(`ls ${prefix}*.text`)
+dirarr=(`ls ${prefix}*.txt`)
 echo ${dirlist[*]}
-
 ```
 
 #### java 提交jar执行class
@@ -1034,7 +1035,6 @@ log4j.appender.console.target=System.err
 log4j.appender.console.layout=org.apache.log4j.PatternLayout
 log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
 
-
 # Settings to quiet third party logs that are too verbose
 log4j.logger.org.eclipse.jetty=WARN
 log4j.logger.org.eclipse.jetty.util.component.AbstractLifeCycle=ERROR
@@ -1043,13 +1043,6 @@ log4j.logger.org.apache.spark.repl.SparkILoop$SparkILoopInterpreter=WARN
 
 spark-sh --num-executors 10 --executor-memory 8G --driver-memory 5G
 spark-sql --num-executors 24 --driver-memory 10G --executor-memory 10G -hivevar ds="2018-08-20" -f hive_fdt.sql
-```
-
-#### sed 插入空行 
-``` sh
-# 隔行插入空行  线先删除已有空行，然后添加一行
-sed '/^$/d;G' data.txt
-
 ```
 
 #### cpu 信息
@@ -1600,7 +1593,38 @@ for f in $(ls -rt ${dir}|head -n -3);do
     echo "rm ${dir:?"undefined 'dir'"}/${f:?"undefined 'f'"}"
     rm ${dir:?"undefined 'dir'"}/${f:?"undefined 'f'"}
 done
+```
 
+#### 脚本渲染
+``` sh
+TAR_DB="tar_db"
+TAR_TABLENAME="tbname"
+eval "cat <<EOF
+$(< pg2pg.datax.json)
+EOF
+"  > result.json
+
+pg2pg.datax.json
+
+"parameter": {
+    "username": "${SRC_USER_NAME}",
+    "password": "${SRC_USER_PWD}",
+    "where": "",
+    "connection": [
+        {
+            "querySql": [
+                "${SRC_SQL}"
+            ],
+            "jdbcUrl": [
+                "jdbc:postgresql://${SRC_HOST_IP}:${SRC_HOST_PORT}/${SRC_DB}"
+            ]
+        }
+    ]
+}
+
+export TAR_DB="tar_db"
+export TAR_TABLENAME="tbname"
+envsubst < pg2pg.datax.json  > result.json
 ```
 
 

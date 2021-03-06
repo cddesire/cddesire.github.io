@@ -208,6 +208,10 @@ import json
 d = dict(name='Bob', age=20, score=88)
 json.dumps(d)
 '{"age": 20, "score": 88, "name": "Bob"}'
+
+# 消除空格
+
+payload = json.dumps(d, separators=(',', ':'))
 # 处理中文
 
 json.dumps(d, ensure_ascii=False)

@@ -250,6 +250,12 @@ anaconda show Anaconda-Extras/mleap
 conda install --channel https://conda.anaconda.org/Anaconda-Extras mleap
 ```
 
+- 格式化python代码
+``` python
+python3 -m black dag.py
+python3 -m black --check --diff dag.py
+```
+
 ### Excel 常用公式
 ``` code
 A列中是否包含B 

@@ -933,7 +933,59 @@ log_date between date_format(date_parse('20201216', '%Y%m%d') - interval '7' day
 
 hour(from_unixtime(cast('1602539327' as int))) -- 05
 
-
 ```
 
+#### 49、presto cross join unnest
+``` sql
+with t(a) as (
+    values array [1, 3, 4, 5], array [3, 5, 6, 1]
+)
+select
+    array_agg(value_sum order by ordinal)
+from
+(
+    select
+        ordinal, avg(value) as value_sum
+    from t
+    cross join unnest(a) with ordinality as x(value, ordinal)
+    group by ordinal
+)t1
+;
+```
+
+#### 50、presto array 聚合平均
+``` sql
+select
+    user
+    , sqrt(reduce(zip_with(user_vec, center_vec, (x, y) -> pow(x - y, 2.0)), 0, (s, x) -> s + x, s -> s)) as score
+from
+(
+    values
+    ('a', array[1,2,3], array[4, 5, 6]),
+    ('b', array[4,5,6], array[7, 8, 9])
+) as t(user, user_vec, center_vec)
+;
+```
+
+#### 51、presto md5
+``` sql
+select lower(to_hex(md5(cast('C22D5673' as varbinary))));
+```
+
+#### 52、presto转json
+``` sql
+select
+  uid
+  , json_format(cast(
+        map_from_entries(array[('hisotry', 
+          array_agg(
+              map_from_entries(array[('vid', cast(vid as bigint)), ('time', cast(log_date as bigint))])
+          )
+        )]) 
+      as json)
+    ) as value
+from user_click
+where log_date='20210131'
+;
+```
 
