@@ -474,13 +474,13 @@ std::string str = "";
 uint32_t ts = static_cast<uint32_t>(std::strtoul(str, nullptr, 10));
 
 // 字符串开始寻找数字或者正负号或者小数点，然后遇到非法字符终止，不会报异常
-long stol (const string&  str, size_t* idx = 0, int base = 10);
-unsigned long stoul (const string&  str, size_t* idx = 0, int base = 10);
-long long stoll (const string&  str, size_t* idx = 0, int base = 10);
-unsigned long long stoull (const string&  str, size_t* idx = 0, int base = 10);
-float stof (const string&  str, size_t* idx = 0);
-double stod (const string&  str, size_t* idx = 0);
-long double stold (const string&  str, size_t* idx = 0);
+long stol(const string&  str, size_t* idx = 0, int base = 10);
+unsigned long stoul(const string&  str, size_t* idx = 0, int base = 10);
+long long stoll(const string&  str, size_t* idx = 0, int base = 10);
+unsigned long long stoull(const string&  str, size_t* idx = 0, int base = 10);
+float stof(const string&  str, size_t* idx = 0);
+double stod(const string&  str, size_t* idx = 0);
+long double stold(const string&  str, size_t* idx = 0);
 
 std::string str = "123.456";
 double d = std::stod(str);

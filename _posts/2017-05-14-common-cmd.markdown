@@ -200,14 +200,17 @@ find . -print -exec chmod 777 {} \;
 #### 分析占用内存过高的进程
 ``` sh
 top -cbo +%MEM | head -n 20 | tail -15
-ps aux --sort -rss | head
+ps aux --sort=-rss | head
 
 ps -aux | sort -nrk3 | head -n 10
 ```
 
 ####  分析CPU过高的java线程
 ``` sh
-ps -aux | sort -nrk3 | head -n 10
+# cpu 降序
+ps aux --sort=-%cpu | head -n 10
+# cpu升序
+ps aux --sort=+%cpu | head -n 10
 
 top -n1 -H | grep -m1 java
 printf "%x" $PID

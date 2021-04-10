@@ -278,6 +278,12 @@ A列中是否包含B
 ##### 查询返回多列
 ![vlookup4](/img/in-post/common-tool/vlookup4.jpg)
 
+### Excel 行列转化
+#### 列转多行
+![offset1](/img/in-post/common-tool/offset1.jpg)
+#### 行转多列
+![offset2](/img/in-post/common-tool/offset2.jpg)
+
 ### Excel 常用技巧
 -	快速选取资料 command + shift + 上下左右方向
 -	转置  复制右击选择性粘贴，转置
