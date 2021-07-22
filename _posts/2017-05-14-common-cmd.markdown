@@ -765,6 +765,9 @@ sed 's/[ \t]\+/\t/g' data
 awk '{printf("%s%s", $0, (NR%3 ? "," : "\n"))}' data
 # next相当于循环中continue的作用，next后面的语句将不再执行
 awk 'NR%3{printf $0",";next;}1' data
+# N 追加下一个输入行到模式空间，用了两次把当前行的后两行都追加到了模式空间，即多行模式空间
+sed 'N;N;s/\n/:/g' data
+
 ````
 
 #### brew

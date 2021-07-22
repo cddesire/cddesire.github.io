@@ -364,3 +364,15 @@ PS1="$white$white@$green\h$white:$cyan\W$yellow\$git_branch$white\$ $normal"
 
 
 ```
+
+### item免密登录
+``` sh
+# 在.ssh文件夹下新建config文件
+Host relay.xxx.xyz
+ControlPath ~/.ssh/master-%r@%h:%p
+ControlMaster auto
+ControlPersist yes
+
+# iTerm Preferences → Profiles → General → Working Directory 选择Reuse Previous sessions's directory
+```
+
