@@ -1267,6 +1267,10 @@ users['harold']['username'] = 'chopper'
 users['matt']['password'] = 'hunter2' 
 
 {“harold”: {“username”: “chopper”}, “matt”: {“password”: “hunter2”}} 
+
+segment_space = defaultdict(lambda: defaultdict(list))
+segment_weights = defaultdict(lambda: defaultdict(float))
+total_weights = defaultdict(float)
 ```
 
 #### 60、keras 打印模型结构
