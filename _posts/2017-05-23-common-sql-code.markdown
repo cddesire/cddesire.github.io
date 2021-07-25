@@ -739,7 +739,7 @@ set hive.merge.mapredfiles=true;
 set hive.merge.size.per.task=256000000;
 set hive.merge.smallfiles.avgsize=12800000;
 -- jvm重用
-set mapred.job.reuse.jvm.num.tasks=10;
+set mapreduce.job.jvm.numtasks=-1;
 --子查询并发执行
 set hive.support.concurrency=true;
 set mapreduce.job.reduce.slowstart.completedmaps=0.9;
