@@ -746,6 +746,11 @@ set mapreduce.job.reduce.slowstart.completedmaps=0.9;
 -- 矢量查询，1024行数据组成一个batch进行处理
 set hive.vectorized.execution.enabled=true;
 set hive.vectorized.execution.reduce.enabled=true;
+
+-- 如果单个map处理大量的计算任务，将单个mapper的分片设置小一点，这样可以起多个任务并行执行
+set mapreduce.input.fileinputformat.split.maxsize=1000000;
+
+
 ```
 
 #### 44、AUC计算
