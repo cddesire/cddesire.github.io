@@ -76,6 +76,9 @@ tags:
 -	http://xidea.online
 -	http://idea.iteblog.com/key.php
 
+### java 工程
+-  https://start.aliyun.com/bootstrap.html
+
 
 ### IDEA 常用插件
 -   ignore
