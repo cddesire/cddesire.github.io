@@ -1407,3 +1407,98 @@ while(completionTask < 50) {
     completionTask++;
 }
 ```
+
+### 58、耗时统计
+``` java
+public class TraceWatch implements AutoCloseable {
+    /** Start time of the current task. */
+    private long startMs;
+    /** Name of the current task. */
+    @Nullable
+    private String currentTaskName;
+    @Getter
+    private final Map<String, List<TaskInfo>> taskMap = new HashMap<>();
+    public TraceWatch start(String taskName) throws IllegalStateException {
+        if (this.currentTaskName != null) {
+            throw new IllegalStateException("Can't start TraceWatch: it's already running");
+        }
+        this.currentTaskName = taskName;
+        this.startMs = TimeUtils.nowMs();
+        return this;
+    }
+    public void stop() throws IllegalStateException {
+        if (this.currentTaskName == null) {
+            throw new IllegalStateException("Can't stop TraceWatch: it's not running");
+        }
+        long lastTime = TimeUtils.nowMs() - this.startMs;
+        TaskInfo info = new TaskInfo(this.currentTaskName, lastTime);
+        this.taskMap.computeIfAbsent(this.currentTaskName, e -> new LinkedList<>()).add(info);
+        this.currentTaskName = null;
+    }
+
+    @Override
+    public void close() {
+        this.stop();
+    }
+    public void record(String taskName, Object data) {
+        TaskInfo info = new TaskInfo(taskName, data);
+        this.taskMap.computeIfAbsent(taskName, e -> new LinkedList<>()).add(info);
+    }
+    @Getter
+    @AllArgsConstructor
+    public static final class TaskInfo {
+        private final String taskName;
+        private final Object data;
+    }
+}
+
+TraceWatch traceWatch = new TraceWatch();
+try(TraceWatch ignored = traceWatch.start("function1")) {
+    try {
+        TimeUnit.SECONDS.sleep(1); // 模拟业务代码
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
+
+public class TraceHolder {
+    public static <T> T run(TraceWatch traceWatch, String taskName, Supplier<T> supplier) {
+        try {
+            traceWatch.start(taskName);
+            return supplier.get();
+        } finally {
+            traceWatch.stop();
+        }
+    }
+    
+    public static void run(TraceWatch traceWatch, String taskName, IntConsumer function) {
+        try {
+            traceWatch.start(taskName);
+            function.accept(0);
+        } finally {
+            traceWatch.stop();
+        }
+    }
+}
+
+TraceWatch traceWatch = new TraceWatch();
+TraceHolder.run(traceWatch, "function1", i -> {
+    try {
+        TimeUnit.SECONDS.sleep(1); 
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+});
+
+String result = TraceHolder.run(traceWatch, "function2", () -> {
+    try {
+        TimeUnit.SECONDS.sleep(1); 
+        return "YES";
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+        return "NO";
+    }
+});
+```
+
+
