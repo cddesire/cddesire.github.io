@@ -403,6 +403,12 @@ select to_date('2017-11-25 13:01:03') from dual; -- 2017-11-25
 select to_date(from_unixtime(unix_timestamp('20200808', 'yyyyMMdd')));    -- 2020-08-08
 select to_date(from_unixtime(unix_timestamp('2020 08 08', 'yyyy MM dd')));   -- 2020-08-08
 
+--20171205转成2017-12-05 
+select from_unixtime(unix_timestamp('20171205','yyyymmdd'),'yyyy-mm-dd') from dual;
+--2017-12-05转成20171205
+select from_unixtime(unix_timestamp('2017-12-05','yyyy-mm-dd'),'yyyymmdd') from dual;
+
+
 ```
 
 #### 21、避免用科学计数法表示浮点数
