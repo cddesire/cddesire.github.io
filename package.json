@@ -1,7 +1,7 @@
 {
     "name": "Daniel-blog",
     "title": "Geek Stuff Blog",
-    "author": "Daniel <aspirin@gmail.com>",
+    "author": "Daniel <744656882@qq.com>",
     "version": "1.7.0",
     "homepage": "http://cddesire.github.io",
     "repository": {
@@ -10,7 +10,7 @@
     },
     "bugs": "https://github.com/cddesire/cddesire.github.io/issues",
     "devDependencies": {
-        "grunt": "~0.4.5",
+        "grunt": ">=1.3.0",
         "grunt-contrib-less": "~0.11.4",
         "grunt-contrib-watch": "~0.6.1",
         "grunt-banner": "~0.2.3",

@@ -76,6 +76,9 @@ tags:
 -	http://xidea.online
 -	http://idea.iteblog.com/key.php
 
+### java 工程
+-  https://start.aliyun.com/bootstrap.html
+
 
 ### IDEA 常用插件
 -   ignore
@@ -241,6 +244,35 @@ index-url = http://pypi.douban.com/simple/
 use-mirrors = true
 mirrors = http://pypi.douban.com/simple/ 
 trusted-host = pypi.douban.com
+```
+-  conda 常用命令
+``` shell
+1、工作环境
+conda env list #或 conda info --env
+
+2、创建工作环境
+#1.创建指定Python版本的环境
+conda create --name env_name python=3.9
+#2.创建指定某些包的环境
+conda create --name env_name numpy scipy
+#3. 1与2结合
+conda create --name env_name python=3.9 numpy scipy
+
+3、进入和退出工作环境
+# 进入(或切换到)py9t工作环境
+activate py39t
+# 退出工作环境
+conda deactivate
+
+4、导出工作环境配置
+#1.导出工作环境到 yml 文件
+conda env export > py39t.yml
+#2.导入 yml 文件工作环境
+conda env create -f py39t.yml
+
+5、更新工作环境
+conda update conda
+conda update --all
 ```
 
 -  conda安装找不到安装

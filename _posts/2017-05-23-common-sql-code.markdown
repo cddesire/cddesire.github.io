@@ -403,6 +403,12 @@ select to_date('2017-11-25 13:01:03') from dual; -- 2017-11-25
 select to_date(from_unixtime(unix_timestamp('20200808', 'yyyyMMdd')));    -- 2020-08-08
 select to_date(from_unixtime(unix_timestamp('2020 08 08', 'yyyy MM dd')));   -- 2020-08-08
 
+--20171205转成2017-12-05 
+select from_unixtime(unix_timestamp('20171205','yyyymmdd'),'yyyy-mm-dd') from dual;
+--2017-12-05转成20171205
+select from_unixtime(unix_timestamp('2017-12-05','yyyy-mm-dd'),'yyyymmdd') from dual;
+
+
 ```
 
 #### 21、避免用科学计数法表示浮点数
@@ -739,13 +745,18 @@ set hive.merge.mapredfiles=true;
 set hive.merge.size.per.task=256000000;
 set hive.merge.smallfiles.avgsize=12800000;
 -- jvm重用
-set mapred.job.reuse.jvm.num.tasks=10;
+set mapreduce.job.jvm.numtasks=-1;
 --子查询并发执行
 set hive.support.concurrency=true;
 set mapreduce.job.reduce.slowstart.completedmaps=0.9;
 -- 矢量查询，1024行数据组成一个batch进行处理
 set hive.vectorized.execution.enabled=true;
 set hive.vectorized.execution.reduce.enabled=true;
+
+-- 如果单个map处理大量的计算任务，将单个mapper的分片设置小一点，这样可以起多个任务并行执行
+set mapreduce.input.fileinputformat.split.maxsize=1000000;
+
+
 ```
 
 #### 44、AUC计算
