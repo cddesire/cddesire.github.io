@@ -756,13 +756,15 @@ echo $(sed 's/$/+/' data)0 |bc
 
 #### 多个空格格式化成一个tab
 ``` sh
-awk -v OFS="\t" '$1=$1' data
+awk '$1=$1' OFS="\t" data
 sed 's/[ \t]\+/\t/g' data
 ```
 
 #### 合并连续的多行
 ``` sh
 awk '{printf("%s%s", $0, (NR%3 ? "," : "\n"))}' data
+# ORS - Output Record Separator 
+awk 'ORS=NR%5?",":"\n"' data
 # next相当于循环中continue的作用，next后面的语句将不再执行
 awk 'NR%3{printf $0",";next;}1' data
 # N 追加下一个输入行到模式空间，用了两次把当前行的后两行都追加到了模式空间，即多行模式空间
