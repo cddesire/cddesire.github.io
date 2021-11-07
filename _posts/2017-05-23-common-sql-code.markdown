@@ -1000,3 +1000,38 @@ where log_date='20210131'
 ;
 ```
 
+#### 53、presto max_by
+``` sql
+select 
+  country,
+  count(case when status = 'logged-in' then 1 end) as logged_in_users,
+  count(case when status = 'logged-out' then 1 end) as logged_out_users
+from (
+    select 
+      user_id,
+      country,
+      status,
+      row_number() over (partition by user_id order by time desc) as rn
+    from user_activity
+)
+where rn = 1
+group by country
+order by count(case when status = 'logged-in' then 1 end) desc
+;
+
+select country,
+       count_if(status = 'logged-in') as logged_in_users,
+       count_if(status = 'logged-out') as logged_out_users
+from (
+    select 
+      user_id,
+      max_by(country, time) as country,
+      max_by(status, time) as status
+    from user_activity
+    group by user_id
+)
+group by 1
+order by 2 desc
+;
+```
+
