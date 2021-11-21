@@ -154,6 +154,7 @@ find . -type f  \( -name "*.java" -o -name "*.scala" \) | xargs cat | grep -v -e
 # 文件拷贝
 find some-dir -type f -name "*.txt" -exec cp \{\} new-dir \;
 find some-dir -type f -name "*.txt" -print0 | xargs -0 cp --target-directory=new-dir
+# -print0 选项表示输出的文件列表以 null 分隔，xargs 命令的 -0 选项表示以 null 作为分隔符，-0选项结合find命令可以正确的复制包含空格的文件名
 find some-dir -type f -name "*.txt" -print0 | xargs -I{} -0 cp -v {} /tmp/log-files
 # 其中{}为参数列表标记，-0表示当文件名为空白行，那么当前的执行命令不起作用，-I表示用来替换初始参数。
 
@@ -491,8 +492,15 @@ $ find /tmp -name "*.tmp" -print0 | xargs -0 rm
 # 统计多个文件的行数
 $ ls -1 *.sh | xargs wc -l
 
+# -n 4 指定每4个参数作为一次命令的输出
+$echo "a b c d e f" | xargs -n 4
+a b c d
+e f
+
 # 批量重命名
-$ ls | xargs -t  -I  {} mv {} {}.old
+# -t 选项打印出最终执行的命令，并且直接执行命令，不再需要用户二次确认
+# -I 参数表示命令行参数的每一项参数的变量
+$ ls | xargs -t -I {} mv {} {}.old
 # sed p 打印行  把base替换为ctr
 $ find . -name "*job" -type f -depth 1| sed -e 'p;s/base/ctr/' | xargs -n2 mv
 
