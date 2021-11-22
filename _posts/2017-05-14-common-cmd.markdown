@@ -501,10 +501,11 @@ e f
 # -t 选项打印出最终执行的命令，并且直接执行命令，不再需要用户二次确认
 # -I 参数表示命令行参数的每一项参数的变量
 $ ls | xargs -t -I {} mv {} {}.old
-# sed p 打印行  把base替换为ctr
+# sed p 打印行  把base替换为ctr，将base文件替换为ctr
 $ find . -name "*job" -type f -depth 1| sed -e 'p;s/base/ctr/' | xargs -n2 mv
 
-yarn application -list | grep "ctr-model" | awk -F " " '{print $1}' | xargs -I {} yarn application -kill {}
+
+$ yarn application -list | grep "ctr-model" | awk -F " " '{print $1}' | xargs -I {} yarn application -kill {}
 ```
 
 #### Shell内置变量
