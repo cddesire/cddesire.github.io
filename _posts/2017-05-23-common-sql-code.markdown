@@ -943,16 +943,39 @@ select "$path" from dws_table;
 
 #### 48、presto 时间转换
 ``` sql
+
+select cast('2019-09-05' as date);
+select cast('2019-09-05 09:50:55' as timestamp);
+select date('2019-09-05');
+select date(cast('2019-09-05 09:50:55' as timestamp));
+
+select date_parse('20200825', '%Y%m%d');  -- 2020-08-25 00:00:00.000
+select date_parse('20200825', '%Y%m%d') + interval '1' day; -- 2020-08-26 00:00:00.000
+select date_parse('20200825', '%Y%m%d') + interval '-1' day; -- 2020-08-24 00:00:00.000
+select date_format(date_parse('20200825', '%Y%m%d') + interval '1' day, 'yyyyMMdd'); -- 20200826
+select date_parse('2019-09-05 09:50:55', '%Y-%m-%d %H:%i:%s');
+
 select format_datetime(from_unixtime(cast(substr('1598865255', 1, 10) as int)), 'yyyy-MM-dd HH:mm:ss');
+select format_datetime(cast('2019-09-05 09:50:55' as timestamp), 'yyyy-MM-dd HH:mm:ss');
+select format_datetime(cast('2019-09-05 09:50:55' as timestamp), 'yyyy-MM-dd');
+select format_datetime(date('2019-09-05'),'yyyy-MM-dd 00:00:00');
 
-date_parse('20200825', '%Y%m%d');  -- 2020-08-25 00:00:00.000
-date_parse('20200825', '%Y%m%d') + interval '1' day; -- 2020-08-26 00:00:00.000
-date_parse('20200825', '%Y%m%d') + interval '-1' day; -- 2020-08-24 00:00:00.000
-date_format(date_parse('20200825', '%Y%m%d') + interval '1' day, '%Y%m%d'); -- 20200826
+hour(from_unixtime(cast('1602539327' as int))) 
 
-log_date between date_format(date_parse('20201216', '%Y%m%d') - interval '7' day, '%Y%m%d') and '${day_n}'
+--date类型字段之间进行比较
+select date_diff('day', cast('2019-11-05' as date), cast('2019-11-07' as date));
+select date_diff('day', cast('2019-09-05 09:50:55' as timestamp), cast('2019-09-07 09:50:55' as timestamp));
+select date_diff('day', date('2019-09-05'), cast('2019-09-07 09:50:55' as timestamp));
 
-hour(from_unixtime(cast('1602539327' as int))) -- 05
+select current_date; --获得今天的日期  
+select current_date - interval '1' day;
+select format_datetime(current_date - interval '1' day, 'yyyyMMdd'); 
+select current_timestamp; --获得当前时间
+select format_datetime(current_timestamp, 'yyyy-MM-dd HH:mm:ss');
+select format_datetime(current_timestamp, 'yyyy-MM-dd');
+select format_datetime(current_timestamp - interval '1' day, 'yyyyMMdd');
+
+log_date between date_format(date_parse('20201216', '%Y%m%d') - interval '7' day, 'yyyyMMdd') and '${day_n}'
 
 ```
 
