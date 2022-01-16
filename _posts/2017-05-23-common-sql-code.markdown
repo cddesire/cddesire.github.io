@@ -458,12 +458,22 @@ analyze table als_30d_fht partition(ds='2020-05-11') compute statistics for colu
 select concat_ws(',', 'abc', 'def', 'gh') from dual; -- abc,def,gh
 ```
 
-#### 26、正则表达式替换
+#### 26、字符串使用户
 ``` sql
 select regexp_replace('foobar', 'oo|ar', '') from dual;
 select regexp_extract('foothebar', 'foo(.*?)(bar)', 1) from dual; -- the
 select regexp_extract('foothebar', 'foo(.*?)(bar)', 2) from dual; -- bar
 select regexp_extract('foothebar', 'foo(.*?)(bar)', 0) from dual; -- foothebar
+
+select substr('abcde', 3); -- cde
+select substr('abcde', -1); -- e
+-- substr(string A, int start, int len)
+select substr('abcde', 3 ,2); -- cd
+select substr('abcde', -2, 2); -- de
+-- 截取第count分隔符之前的字符串，如count为正则从左边开始截取，如果为负则从右边开始截取
+select substring_index('www.apache.org', '.', 2);  -- www.apache
+-- 将input出现在from中的字符串替换成to中的字符串
+select translate("MOBIN", "BIN", "M"); -- MOM
 ```
 
 #### 27、json解析
