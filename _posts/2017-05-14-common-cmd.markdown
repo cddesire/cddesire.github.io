@@ -522,6 +522,7 @@ $*,$@: 表示所有的参数.
 #### 编码转换
 ``` sh
 for i in `find . -name "*.java"`; do iconv -f gbk -t utf-8 $i > $i.new; done
+# 
 find . -name "*.new" | sed 's/\(.*\).new$/mv "&" "\1"/' | sh
 ```
 
@@ -599,7 +600,7 @@ nohup bash command.sh >> a.log 2>&1 &
 ````
 
 #### bash 拼接数组
-``` sh
+``` haskell
 # arr_len=${#my_array[@]}
 my_array=($(hadoop fs -ls  /user/hour/log_date=* | grep "weighted$" |awk '{print $NF}' | sort | tail -n 30))
 arr_str="${my_array[@]}"
@@ -617,16 +618,16 @@ done
 ```
 
 #### bash 字符串切割数组
-``` sh
+``` haskell
 a="one,two,three,four"
 # 备份默认的分隔符
 OLD_IFS="$IFS"
 IFS=","
 eval arr=($a)
 IFS="$OLD_IFS"
-for s in ${arr[@]}
+for i in ${arr[@]};
 do
-  echo "$s"
+  echo "${i}"
 done
 ```
 
@@ -661,7 +662,7 @@ b=${a/23/BB}
 |文件比较|`-e, -r, -w, -x, -f, -d, -L, -s, -b, -c, -t, -nt, -ot`|`-e, -r, -w, -x, -f, -d, -L, -s, -b, -c, -t, -nt, -ot`|`if [ -e /usr/local/localtime ]; then ... ; fi`|
 |逻辑比较|`-a, -o, !`|`&&, \|\|, !`|`if [ $str1 == $str2 -a -n $str3 ]; then ... ; fi`|
 
-``` {sh}
+``` haskell
 # -z ：判断 string 是否是空串
 # -n ：判断 string 是否是非空串
 # 必须用引号将字符串界定起来
@@ -678,7 +679,7 @@ fi
 ```
 
 #### 条件分支
-``` {sh}
+``` haskell
 # 命令执行成功，则其返回值为0，否则为非0
 
 if [ $? -eq 0 ]; then
@@ -695,7 +696,7 @@ fi
 ```
 
 #### 循环
-``` {sh}
+``` haskell
 #遍历输出脚本的参数
 for i in $@; do
     echo $i
@@ -811,7 +812,7 @@ source ~/.bash_profile
 [更多参考](http://zqpythonic.qiniucdn.com/data/20111223160257/index.html)
 
 #### 数据补全跑批
-``` {sh}
+``` haskell
 today=`date "+%Y-%m-%d %H"`
 for ((i=0; i<=168; i++))
 do
@@ -886,7 +887,7 @@ ${fullfilename:5:5}
 ```
 
 #### dirname 脚本文件放置的目录
-``` {sh}
+``` java
 # 如执行bash +x Documents/test.sh
 echo "$(dirname `readlink -f -- $0`)"：Documents
 echo "$(cd "$(dirname `readlink -f -- $0`)"; pwd)/find_spark_home.py"： /Users/changdong/Documents/find_spark_home.py
@@ -951,7 +952,7 @@ yarn node -list -all
 ```
 
 #### 数组包含contains
-``` {sh}
+``` haskell
 array=(zero one two three four five)
 if [[ "${array[@]}" =~ "one" ]]; then
     echo "111111"
@@ -968,7 +969,7 @@ sshpass -p passwd rsync -av --progress --inplace --rsh='ssh -p88888' src dev@8.8
 ```
 
 #### 批量作业等待
-``` {sh}
+``` haskell
 unrelated_job &
 for i in 1 2 3 4 5; do
   cmd & pids+=($!)
@@ -1002,7 +1003,7 @@ ls -lS
 ```
 
 #### 查看通配符文件是否存在
-``` {sh}
+``` haskell
 files=$(ls test* 2> /dev/null | wc -l)
 if [[ "$files" != "0" ]]; then
    echo "Exists"
@@ -1132,7 +1133,7 @@ tldr tar
 ```
  
 #### && 简化 if else
-``` {sh}
+``` haskell
 gzip -t a.tar.gz
 
 if [[ 0 == $? ]]; then
@@ -1156,7 +1157,7 @@ gzip -t a.tar.gz && echo "good zip" || echo "bad zip"
 ```
 
 #### Contains 子字符串
-``` {sh}
+``` haskell
 string="My string"
 
 if [[ $string == My* ]]; then
@@ -1203,7 +1204,7 @@ alias netstatotal='netstat -an|awk '\''/tcp/ {print $6}'\''|sort|uniq -c'
 ```
 
 #### 多台机器查找
-``` sh
+``` haskell
 multi.sh
 
 #!/usr/bash
@@ -1241,7 +1242,7 @@ rm -rf ${data_path:?"undefined 'data_path'"}
 ```
 
 #### 死循环用colon(:)
-``` {sh}
+``` haskell
 
 while : ;
 do
@@ -1253,7 +1254,7 @@ done
 ```
 
 #### 参数检查函数
-``` {sh}
+``` haskell
 function check_argument() {
   local name=${1:?"missing 'name'"};shift
   local arg=${1:?"missing 'arg'"};shift
@@ -1393,7 +1394,7 @@ git checkout --track origin/daves
 ```
 
 #### log
-``` {sh}
+``` haskell
 function log_info()
 {
     now=`date "+%Y-%m-%d %H:%M:%S"`
@@ -1494,7 +1495,7 @@ java -jar arthas-boot.jar
 ```
 
 #### 参数脚本
-``` sh
+``` haskell
 #!/bin/bash 
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
@@ -1582,7 +1583,7 @@ msg "- arguments: ${args[*]-}"
 ```
 
 #### 删除文件保留最近3个
-``` sh
+``` haskell
 #!/bin/bash
 set -e -o pipefail
 basedir=$(cd $(dirname $(readlink -f ${BASH_SOURCE:-$0}));pwd)
