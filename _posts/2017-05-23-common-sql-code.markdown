@@ -1068,3 +1068,55 @@ order by 2 desc
 ;
 ```
 
+
+
+#### 54、presto zip_with
+``` sql
+
+with
+tdl_av_feature_fdt as (
+    select
+        key as itemid,
+        zip_with(
+            transform(filter(split(value, '|'), x->trim(x)<>''), x->split(x, ' ')[1])
+            , transform(filter(split(value, '|'), x->trim(x)<>''), x->trim(x))
+            , (x, y) -> (trim(x), trim(replace(y, x, '')))
+        ) as features
+    from item_feature
+    where log_date='20220707' and log_hour='22'
+)
+select
+    k as feat_name
+    , count(1) as total
+    , count(distinct itemid) as avs
+    , count(distinct if(trim(v)='', null, trim(v))) as non_dis_vals
+    , sum(if(trim(v)='', 0, 1)) as non_empty_vals
+from tdl_av_feature_fdt
+cross join unnest(features) as t(k, v)
+group by 1
+order by 1
+;
+
+
+with
+t_user_feature_fdt as (
+    select
+        key as mid,
+        zip_with(
+            transform(filter(split(value.value, '|'), x->trim(x)<>''), x->split(x, ' ')[1])
+            , transform(filter(split(value.value, '|'), x->trim(x)<>''), x->trim(x))
+            , (x, y) -> (trim(x), trim(replace(y, x, '')))
+        ) as features
+    from user_feature
+    where log_date='20220712' and log_hour='20' 
+)
+select
+    mid
+    , k
+    , array_join(array_sort(split(trim(v), ' ')), ' ') as v
+from t_user_feature_fdt
+cross join unnest(features) as t(k, v)
+;
+
+```
+
