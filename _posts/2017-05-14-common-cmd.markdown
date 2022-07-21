@@ -1651,15 +1651,20 @@ envsubst < pg2pg.datax.json  > result.json
 #!/bin/bash
 
 for broke_link_file in $(find base/ -xtype l); do
-	echo ${broke_link_file} 
-	# rm -rf ${broke_link_file} 
-	fail_link=$(ls -l ${broke_link_file} | awk '{print $11}')
+    echo ${broke_link_file}
+    fail_link=$(ls -l ${broke_link_file} | awk '{print $11}')
     fail_link_path=$(echo ${fail_link} | cut -f 1-5 -d "/")
     fail_file=${fail_link##*/}
     valid_file_pattern="${fail_link_path}/*/*/*/${fail_file}"
-    valid_file=$(ls -lat ${valid_file_pattern} | head -n 1 | awk '{print $NF}')
-    echo "link ${valid_file} to ${broke_link_file}"
-    # ln -s ${valid_file} ${broke_link_file}
+    ls -lat ${valid_file_pattern}
+    if [[ $? == 0 ]]; then
+        valid_file=$(ls -lat ${valid_file_pattern} | head -n 1 | awk '{print $NF}')
+        echo "link ${valid_file} to ${broke_link_file}"
+        rm -rf ${broke_link_file}
+        ln -s ${valid_file} ${broke_link_file}
+    else
+        echo "source file ${valid_file_pattern} is not exist"
+    fi
 done
 ```
 
