@@ -1009,6 +1009,36 @@ from
     ('b', array[4,5,6], array[7, 8, 9])
 ) as t(user, user_vec, center_vec)
 ;
+
+-- cos similarity
+with
+tdl_user_norm_emb_fdt as (
+    select
+        user
+        , transform(user_vec, x -> x / user_norm) as user_norm_vec
+        , transform(center_vec, x -> x / cent_norm) as cent_norm_vec
+    from 
+    (
+        select
+            user
+            , cast(split(user_vec, ',') as array(double)) as user_vec
+            , cast(split(center_vec, ',') as array(double)) as center_vec 
+            , reduce(cast(split(user_vec, ',') as array(double)), 0, (s, x) -> s + x * x, s -> sqrt(s)) as user_norm
+            , reduce(cast(split(center_vec, ',') as array(double)), 0, (s, x) -> s + x * x, s -> sqrt(s)) as cent_norm
+        from
+        (
+            values
+            ('a', '1,2,3', '4,5,6'),
+            ('b', '4,5,6', '7,8,9')
+        ) as t(user, user_vec, center_vec)
+    )t
+)
+select
+    user
+    , reduce(zip_with(user_norm_vec, cent_norm_vec, (x, y) -> x * y), 0, (s, x) -> s + x, s -> s) as cos_sim
+from tdl_user_norm_emb_fdt
+;
+
 ```
 
 #### 51、presto md5
