@@ -56,19 +56,23 @@ tags:
 -	PackageResourceViewer 设置主题参数
 
 ### Sublime 配置
-``` sh
+``` json
 {
-  "color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
-  "font_face": "Source Code Pro",
-  "font_size": 15,
-  "ignored_packages":
-  [
-    "Vintage"
-  ],
-  "line_padding_bottom": 2,
-  "line_padding_top": 2,
-  "theme": "Default.sublime-theme"
+	"color_scheme": "Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
+	"font_face": "Source Code Pro",
+	"font_size": 14,
+	"ignored_packages":
+	[
+		"Vintage"
+	],
+	"line_padding_bottom": 2,
+	"line_padding_top": 3,
+	"theme": "Default.sublime-theme",
+	"tab_size": 4,
+        "translate_tabs_to_spaces": true,
+        "expand_tabs_on_save": true
 }
+
 ```
 
 
