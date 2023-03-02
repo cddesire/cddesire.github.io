@@ -436,6 +436,15 @@ auto it = std::remove_if(std::begin(vec), std::end(vec), [&filter_set](const uin
 });
 vec.erase(it, vec.end());
 std::copy(vec.cbegin(), vec.cend(), std::ostream_iterator<uint64_t>(std::cout, "\t"));
+
+void historyCut(ShowHistory *history, const std::chrono::system_clock::duration &ttl, const std::chrono::system_clock::time_point &base) {
+    auto begin = std::chrono::duration_cast<std::chrono::seconds>((base - ttl).time_since_epoch()).count();
+    auto it = std::remove_if(history->mutable_values()->begin(), history->mutable_values()->end(), [&begin](const ShowHistorySession &item) {
+        return item.state().time() < begin;
+    });
+    history->mutable_values()->erase(it, history->mutable_values()->end());
+}
+
 // 移除重复元素
 std::sort(vec.begin(), vec.end());
 vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
