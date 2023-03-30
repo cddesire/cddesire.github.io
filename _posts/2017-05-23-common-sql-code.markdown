@@ -1061,6 +1061,17 @@ select
 from user_click
 where log_date='20210131'
 ;
+
+
+select
+    trackid
+    , mid
+    , cast(element_at(item, 'up_id') as bigint) as upid
+    , get_json_object(element_at(item, 'feature'), '$.sources_simple') as trigger_type
+    , get_json_object(user_feature, '$.page_number') as page_number
+from rec_feed_show
+cross join unnest(try_cast(json_parse(showlist) as array<map<varchar, varchar>>)) as x(item)
+where log_date='20230328'
 ```
 
 #### 53、presto max_by
