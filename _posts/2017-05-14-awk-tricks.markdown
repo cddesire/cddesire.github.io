@@ -180,6 +180,10 @@ echo "abcdef" | gawk 'match($0, /b(.*)e/, a) {print a[1]}'  #cd
 echo "xxx=a&yyy=b&zzz=c" | awk '{match($0,"yyy=([^&]+)",a);print a[1]}'
 ```
 
+``` shell
+ echo "xxx=aa&yyy=bb&zzz=cc" | grep -Po 'yyy=(.*?)+&'
+```
+
 -	**写入多个文件**
 ```	shell
 awk '{print >> ("filename"$1)}'
