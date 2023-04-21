@@ -182,6 +182,7 @@ echo "xxx=a&yyy=b&zzz=c" | awk '{match($0,"yyy=([^&]+)",a);print a[1]}'
 
 ``` shell
  echo "xxx=aa&yyy=bb&zzz=cc" | grep -Po 'yyy=(.*?)+&'
+ Appending a ? to greedy quantifiers makes them non-greedy.
 ```
 
 -	**写入多个文件**
