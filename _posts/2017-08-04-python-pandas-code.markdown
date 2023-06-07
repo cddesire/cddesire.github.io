@@ -124,7 +124,7 @@ pd.read_csv("data.csv", index_col=0)
 
 
 df_test = pd.read_csv("http://mlr.cs.umass.edu/ml/machine-learning-databases/adult/adult.test", names=COLUMNS, skipinitialspace=True, skiprows=1)
-df_test = pd.read_csv(test_data, sep=",", header=None, names=COLUMNS, engine = "python", skipinitialspace=True, skiprows=1)
+df_test = pd.read_csv(test_data, sep=",", header=None, names=COLUMNS, engine="python", skipinitialspace=True, skiprows=1, skipfooter=1)
 
 df2 = pd.read_csv(file, sep="\t", skiprows=10000, nrows=100)
 dfn = pd.read_csv(file, sep="\t", skiprows=(n-1)*10000, nrows=100) # skiprows 也可以为list
