@@ -948,6 +948,7 @@ select cast('2019-09-05' as date);
 select cast('2019-09-05 09:50:55' as timestamp);
 select date('2019-09-05');
 select date(cast('2019-09-05 09:50:55' as timestamp));
+select cast(to_unixtime(timestamp('2023-06-28 23:39:36')) as bigint);  1687966776
 
 select date_parse('20200825', '%Y%m%d');  -- 2020-08-25 00:00:00.000
 select date_parse('20200825', '%Y%m%d') + interval '1' day; -- 2020-08-26 00:00:00.000
