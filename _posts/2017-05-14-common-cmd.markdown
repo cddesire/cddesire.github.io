@@ -168,7 +168,7 @@ find some-dir -type f -mtime +7 -name  "*.log" -exec rm -f {} \;
 # atime指access time，即文件被读取或者执行的时间
 # ctime即change time文件状态改变时间，指文件的i结点被修改的时间，如通过chmod修改文件属性
 # mtime即modify time，指文件内容被修改的时间
-# 除了最近的10个目录，删除其他所有文件 -r 逆序排列
+# 除了最近的10个目录，删除其他所有文件 -d 列出目录 -1 列出文件那一列  -t 时间排序 从最新文件开始 -r 逆序排列 -10 开头到倒数第10个
 ls -d -1tr major/major_* | head -n -10 | xargs rm -rf
 # 空文件
 find . -type f -size 0 -delete
