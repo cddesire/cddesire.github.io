@@ -645,8 +645,48 @@ np.cov(A)
 np.corrcoef(A)
 ```
 
+#### 23、kNN求解
+``` python
+import numpy as np
+from numpy import ndarray
 
-#### 23、稀疏举例
+random.seed(5)
+
+def generate_points(n: int=6) -> list[tuple]:
+    points = []
+    for i in range(n):
+        points.append((random.randint(0, 100), random.randint(0, 100)))
+    return points
+
+def structured_array(points: list[tuple]) -> ndarray:
+    dt = np.dtype([('x', 'int'), ('y', 'int')])
+    return np.array(points, dtype=dt)
+
+def np_find_dist(s_array: ndarray) -> ndarray:
+    size = s_array.shape[0]
+    a = s_array.reshape(size, 1)
+    b = s_array.reshape(1, size)
+    # 广播机制
+    dist = (a['x'] - b['x'])**2 + (a['y'] - b['y'])**2
+    return dist
+
+def np_k_nearest(dist: ndarray, k: int) -> ndarray:
+    k_indices = np.argpartition(dist, k+1, axis=1)[:, :k+1]
+    return k_indices
+
+def np_main(count: int = 6, top_k: int = 2):
+    points = generate_points(count)
+    s_array = structured_array(points)
+    np_dist = np_find_dist(s_array)
+    k_indices = np_k_nearest(np_dist, top_k - 1)
+    # 花式索引
+    results = [s_array[k_indices[i, :k+1]] for i in range(s_array.shape[0])]
+    return results, s_array, k_indices, k
+
+results, s_array, k_indices, k = np_main(100, 1)
+```
+
+#### 24、稀疏举例
 ###### Coordinate (COO)
 COO 格式中每一个元素用一个三元组（行号，列号，数值）表示
 
@@ -688,7 +728,7 @@ array([[1, 0, 2],
        [4, 5, 6]])
 ```
 
-#### 24、numpy array和tensor轴线对比
+#### 25、numpy array和tensor轴线对比
 ``` python
 x = tf.constant([[0, 1], [2, 3], [4, 5]])
 tf.reduce_sum(x)  # 15
