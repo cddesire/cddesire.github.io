@@ -759,3 +759,33 @@ np.sum(a, axis=1, keepdims=True) # array([[1],[5],[9]])
 
 np.sum(a, axis=-1) # array([1, 5, 9])
 ```
+
+#### 26、Numexpr优化
+``` python
+import numpy as np
+from numpy import ndarray
+import numexpr as ne
+
+rng = np.random.default_rng(seed=4000)
+
+def generate_ndarray(rows: int) -> np.ndarray:
+    result_array = rng.random((rows, 1))
+    return result_array
+
+arr = generate_ndarray(10)
+
+
+def numexpr_to_binary(np_array: np.ndarray) -> np.ndarray:
+    # N * 1 -> N
+    temp = np_array[:, 0]
+    temp = ne.evaluate("where(temp<0.5, 0, 1)")
+    # N -> N * 1
+    return temp[:, np.newaxis]
+
+arr = generate_ndarray(10)
+result = numexpr_to_binary(arr)
+
+mapping = np.column_stack((arr, result))
+mapping
+
+```
