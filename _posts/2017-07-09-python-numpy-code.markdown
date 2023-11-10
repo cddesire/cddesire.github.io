@@ -15,6 +15,8 @@ tags:
 #### 1、数组创建
 
 ``` python
+np.set_printoptions(precision=6, linewidth=320, suppress=True)
+
 # 生成[0,1)之间的数据
 
 np.random.random(10)
