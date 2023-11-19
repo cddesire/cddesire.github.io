@@ -284,23 +284,37 @@ array([[[ 1,  7],
         [ 6, 12]]])
 ```
 
-#### 5、转置数组
+#### 5、数组增加一维
 ``` python
-import numpy as np
-# np.newaxis 1D切片为2D 等价于np.expand_dims([5,4], axis=0)或np.stack([a], axis=0)
-
->>> a = np.array([5,4])[np.newaxis] 
->>> a.T
-
->>> a = np.array([1, 2, 3, 4])
+>>> import numpy as np
+>>> a = np.random.rand(4)
 >>> a
-array([1, 2, 3, 4])
->>> a = a.reshape((-1, 1)) # -1：as many rows as needed
->>> a
-array([[1],
-       [2],
-       [3],
-       [4]])
+array([0.153286, 0.78193 , 0.813937, 0.211314])
+>>> a[np.newaxis, ...]
+array([[0.153286, 0.78193 , 0.813937, 0.211314]])
+>>> a[np.newaxis, :]
+array([[0.153286, 0.78193 , 0.813937, 0.211314]])
+>>> a[:, np.newaxis]
+array([[0.153286],
+       [0.78193 ],
+       [0.813937],
+       [0.211314]])
+>>> np.expand_dims(a, axis=0)
+array([[0.153286, 0.78193 , 0.813937, 0.211314]])
+>>> np.expand_dims(a, axis=1)
+array([[0.153286],
+       [0.78193 ],
+       [0.813937],
+       [0.211314]])
+>>> np.reshape(a, (-1, 1))
+array([[0.153286],
+       [0.78193 ],
+       [0.813937],
+       [0.211314]])
+
+>>> b = np.reshape(a, (-1, 1))
+>>> np.squeeze(b, axis=1)
+array([0.153286, 0.78193 , 0.813937, 0.211314])
 ```
 
 #### 6、where
