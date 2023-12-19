@@ -221,6 +221,10 @@ set wrap
 set linebreak
 set nobackup
 set noswapfile
+
+set nocompatible
+set backspace=2
+set nu
 ```
 
 ### BASH
