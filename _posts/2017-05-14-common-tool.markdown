@@ -294,6 +294,7 @@ conda install --channel https://conda.anaconda.org/Anaconda-Extras mleap
 
 - 格式化python代码
 ``` python
+https://pypi.org/project/black/
 python3 -m black dag.py
 python3 -m black --check --diff dag.py
 ```
