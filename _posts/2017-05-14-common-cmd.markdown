@@ -1024,11 +1024,12 @@ echo '{"hostname":"test","uid":"123"}'  | python -m json.tool | grep hostname
 # 提取value
 echo '{"hostname":"test","uid":"123"}' | awk '{match($0, /hostname\":\"(\w+)\"/, a); print a[1]}'
 
-# jq 命令
+# jq 命令  https://jqplay.org/#
 curl 'https://api.github.com/repos/stedolan/jq/commits?per_page=5'  | jq '.[] | {message: .commit.message, name: .commit.committer.name}'
 # tr -d '"' 是将json中的引号去掉
 pbpaste | jq '.[]|.id' | tr -d '"' | tr '\n' ','
-
+# av_feature 不是标准json，需要剔除掉首位的引号和反斜线
+cat req.json | jq '.data|.[]|.av_feature' | sed -e 's/^"//;s/"$//;s/\\//g' | jq '.score'
 ```
 
 #### 目录下的文件转换为array
